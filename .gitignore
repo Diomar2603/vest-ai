@@ -1,0 +1,52 @@
+# 🚀 Ignorar Node Modules (para front e back)
+node_modules/
+**/node_modules/
+
+# 🚀 Ignorar Builds e Compilação (para Next.js e Express)
+dist/
+.next/
+out/
+build/
+
+# 🚀 Ignorar Arquivos de Cache do TypeScript
+*.tsbuildinfo
+
+# 🚀 Ignorar Logs e Arquivos Temporários
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 🚀 Ignorar Arquivos de Ambiente (Variáveis Sensíveis)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 🚀 Ignorar Dependências do Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# 🚀 Ignorar Dependências de Cache do Yarn e PNPM
+.pnp
+.pnp.js
+.npm/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# 🚀 Ignorar Dependências do Next.js (cache e configuração)
+.next/
+.vercel/
+
+# 🚀 Ignorar Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.swn
+*.bak
