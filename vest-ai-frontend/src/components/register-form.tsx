@@ -13,15 +13,54 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useState } from "react"
 
+// Update FormValues type
 type FormValues = {
-  email: string
+  fullName: string,
+  email: string,
+  password: string,
+  confirmPassword: string,
+  // Optional but recommended
+  phoneNumber?: string,
+  // New style preference fields
+
+  dressingStyle: string[],
+  preferredColors: string[],
+  stylePreferences: string[],
+  priceRange: string,
+  preferredPatterns: string[],
+  followsTrends: string,
+  
+  // Clothes and Fabrics
+  commonClothingTypes: string[],
+  preferredFabrics: string[],
+  avoidedFabrics: string[],
+  
+  // Fit and Size
+  clothingSize: string,
+  fitPreference: string,
+  bodyType: string,
+  
+  // Occasions
+  occasionNeeds: string[],
+  formalStyle: string,
+  casualStyle: string[],
+  
+  // Accessories
+  commonAccessories: string[],
+  commonShoeTypes: string[],
+  
+  // Additional Preferences
+  sustainabilityPreference: string,
+  skinTonePalette: string,
 }
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const [step, setStep] = useState(1);
    const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     toast("You submitted the following values:", {
@@ -37,68 +76,249 @@ export function RegisterForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Bem vindo</CardTitle>
+          <CardTitle className="text-xl">
+            {step === 1 ? "Criar Conta" : "Suas Preferências de Estilo"}
+          </CardTitle>
           <CardDescription>
-            Crie uma conta com um dos seguintes métodos
+            {step === 1 
+              ? "Crie uma conta preenchendo os campos abaixo"
+              : "Conte-nos sobre seu estilo para recomendações personalizadas"
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                      fill="currentColor"
+              {step === 1 ? (
+                <div className="grid gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="fullName">Nome completo</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="João da Silva"
+                      {...register("fullName", { required: true })}
                     />
-                  </svg>
-                  Entrar com Apple
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path
-                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                      fill="currentColor"
+                    {errors?.fullName && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      {...register("email", { required: true })}
                     />
-                  </svg>
-                  Entrar com Google
-                </Button>
-              </div>
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                  Ou continue com
-                </span>
-              </div>
-              <div className="grid gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    {...register("email", { required: true })}
-                  />
-                  {errors?.email && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
+                    {errors?.email && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Senha</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      {...register("password", { required: true, minLength: 8 })}
+                    />
+                    {errors?.password && <CardDescription className="text-red-500">Senha deve ter no mínimo 8 caracteres</CardDescription>}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      {...register("confirmPassword", { required: true  })}
+                    />
+                    {errors?.confirmPassword && <CardDescription className="text-red-500">As senhas devem ser iguais</CardDescription>}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="phoneNumber">Telefone (opcional)</Label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="(11) 98765-4321"
+                      {...register("phoneNumber")}
+                    />
+                  </div>
+                  <Button 
+                    type="button" 
+                    className="w-full"
+                    onClick={() => setStep(2)}
+                  >
+                    Próximo
+                  </Button>
                 </div>
-                <Button type="submit" className="w-full">
-                  Cadastrar
-                </Button>
-              </div>
-              <div className="text-center text-sm">
-                Já possui uma conta?{" "}
-                <a href="/login" className="underline underline-offset-4">
-                  Entre
-                </a>
-              </div>
+              // Replace the second step content with:
+              ) : (
+                <div className="grid gap-8">  {/* Changed from gap-6 to gap-8 */}
+                  <div className="grid gap-2">
+                    <Label>Tipo Corporal</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                      {...register("bodyType", { required: true })}
+                    >
+                      <option value="">Selecione seu tipo corporal</option>
+                      <option value="hourglass">Ampulheta</option>
+                      <option value="rectangle">Retangular</option>
+                      <option value="triangle">Triângulo</option>
+                      <option value="inverted-triangle">Triângulo Invertido</option>
+                      <option value="oval">Oval</option>
+                    </select>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Estilo Preferido</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {["Casual", "Elegante", "Esportivo", "Vintage", "Minimalista"].map((style) => (
+                        <label key={style} className="flex items-center space-x-3">
+                          <div className="w-5">
+                            <Input
+                              type="checkbox"
+                              value={style}
+                              className="h-4 w-4"
+                              {...register("stylePreferences")}
+                            />
+                          </div>
+                          <span className="text-sm">{style}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Faixa de Preço</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                      {...register("priceRange", { required: true })}
+                    >
+                      <option value="">Selecione sua faixa de preço</option>
+                      <option value="budget">Econômico</option>
+                      <option value="moderate">Moderado</option>
+                      <option value="premium">Premium</option>
+                      <option value="luxury">Luxo</option>
+                    </select>
+                  </div>
+
+                  <div className="grid gap-4">  {/* Added a section wrapper with gap-8 */}
+                    <h3 className="font-semibold">Estilo e Preferências</h3>
+                    
+                    <div className="grid gap-4">  {/* Changed from gap-2 to gap-4 */}
+                      <div className="grid gap-2">
+                        <Label>Estilo Preferido</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          {["Casual", "Formal", "Esportivo", "Boho", "Minimalista", "Clássico"].map((style) => (
+                            <label key={style} className="flex items-center space-x-3">
+                              <div className="w-5">
+                                <Input
+                                  type="checkbox"
+                                  value={style}
+                                  className="h-4 w-4"
+                                  {...register("dressingStyle")}
+                                />
+                              </div>
+                              <span className="text-sm">{style}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label>Cores preferidas (escolha até 3)</Label>
+                        <div className="grid grid-cols-3 gap-4">
+                          {["Preto", "Branco", "Azul", "Vermelho", "Verde", "Rosa", "Bege", "Marrom", "Roxo"].map((color) => (
+                            <label key={color} className="flex items-center space-x-3">
+                              <div className="w-5">
+                                <Input
+                                  type="checkbox"
+                                  value={color}
+                                  className="h-4 w-4"
+                                  {...register("preferredColors")}
+                                />
+                              </div>
+                              <span className="text-sm">{color}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                        <Label>Padrões preferidos</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          {["Liso", "Listrado", "Estampado", "Xadrez", "Poá", "Floral"].map((pattern) => (
+                            <label key={pattern} className="flex items-center space-x-3">
+                              <div className="w-5">
+                                <Input
+                                  type="checkbox"
+                                  value={pattern}
+                                  className="h-4 w-4"
+                                  {...register("preferredPatterns")}
+                                />
+                              </div>
+                              <span className="text-sm">{pattern}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4">  {/* Added consistent section spacing */}
+                    <h3 className="font-semibold">Tamanho e Caimento</h3>
+                    
+                    <div className="grid gap-2">
+                      <Label>Tamanho de roupa</Label>
+                      <select 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        {...register("clothingSize")}
+                      >
+                        <option value="">Selecione seu tamanho</option>
+                        {["PP", "P", "M", "G", "GG", "XG"].map((size) => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label>Preferência de caimento</Label>
+                      <select 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        {...register("fitPreference")}
+                      >
+                        <option value="">Selecione sua preferência</option>
+                        <option value="fitted">Ajustado ao corpo</option>
+                        <option value="loose">Mais solto</option>
+                        <option value="mixed">Depende da peça</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Tom de pele</Label>
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                      {...register("skinTonePalette")}
+                    >
+                      <option value="">Selecione seu subtom</option>
+                      <option value="cool">Frio (subtom rosa, vermelho ou azul)</option>
+                      <option value="warm">Quente (subtom dourado, amarelo ou pêssego)</option>
+                      <option value="neutral">Neutro (mistura equilibrada)</option>
+                    </select>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <div className="flex gap-4 pt-4">
+                      <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                        Voltar
+                      </Button>
+                      <Button type="submit" className="flex-1">
+                        Finalizar Cadastro
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </CardContent>
       </Card>
-      <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   )
 }
