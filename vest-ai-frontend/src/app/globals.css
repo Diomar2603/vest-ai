@@ -127,3 +127,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Add this to your globals.css file */
+button, 
+a, 
+[role="button"],
+.cursor-pointer,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+.interactive {
+  cursor: pointer;
+}

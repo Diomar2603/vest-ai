@@ -43,13 +43,12 @@ export default function Home() {
             <p className="max-w-[42rem] text-muted-foreground text-lg mb-10">
               Nossa IA analisa suas preferências, tipo de corpo e objetivos de estilo para recomendar looks personalizados que realmente refletem quem você é.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto">
-              <Button size="lg" className="w-full">
-                Experimente Grátis
-              </Button>
-              <Button size="lg" variant="outline" className="w-full">
-                Ver Exemplos
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto justify-center">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full">
+                  Experimente Grátis
+                </Button>
+              </Link>
             </div>
 
             <div className="relative w-full max-w-5xl mt-16 rounded-lg overflow-hidden shadow-xl">
@@ -300,121 +299,8 @@ export default function Home() {
                 </Card>
               ))}
             </div>
-
-            <div className="mt-16 text-center">
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <Users className="h-5 w-5 text-primary" />
-                <span className="text-lg font-medium">Confiado por mais de 10.000 entusiastas da moda</span>
-              </div>
-              <Button size="lg">Leia Mais Histórias de Sucesso</Button>
-            </div>
           </div>
-        </section>
-
-
-        {/* Seção Preços */}
-        <section id="pricing" className="py-20 flex items-center justify-center px-4">
-          <div className="container">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Preços Simples e Transparentes</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Escolha o plano que melhor atende às suas necessidades de moda.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {[
-                {
-                  name: "Básico",
-                  price: "R$ 49,90",
-                  description: "Perfeito para experimentar nossas recomendações de moda com IA.",
-                  features: [
-                    "Perfil de estilo básico",
-                    "10 recomendações de looks por mês",
-                    "Salvar looks favoritos",
-                    "Suporte por e-mail",
-                  ],
-                  popular: false,
-                  buttonText: "Comece Agora",
-                },
-                {
-                  name: "Premium",
-                  price: "R$ 99,90",
-                  description: "Nosso plano mais popular para entusiastas da moda.",
-                  features: [
-                    "Perfil de estilo avançado",
-                    "Recomendações de looks ilimitadas",
-                    "Atualizações sazonais do guarda-roupa",
-                    "Compra direta pela plataforma",
-                    "Suporte prioritário",
-                  ],
-                  popular: true,
-                  buttonText: "Experimente o Premium",
-                },
-                {
-                  name: "Personal Stylist",
-                  price: "R$ 199,90",
-                  description: "Para quem busca a experiência de moda definitiva.",
-                  features: [
-                    "Todos os recursos do Premium",
-                    "Consultor de estilo com IA",
-                    "Consultas por vídeo",
-                    "Estilização para ocasiões especiais",
-                    "Descontos exclusivos em marcas parceiras",
-                    "Suporte 24/7",
-                  ],
-                  popular: false,
-                  buttonText: "Escolha Personal Stylist",
-                },
-              ].map((plan, i) => (
-                <Card key={i} className={`relative ${plan.popular ? "border-primary shadow-lg" : ""}`}>
-                  {plan.popular && (
-                    <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
-                      <Badge className="bg-primary">Mais Popular</Badge>
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle>{plan.name}</CardTitle>
-                    <div className="mt-4">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      <span className="text-muted-foreground"> / mês</span>
-                    </div>
-                    <CardDescription className="mt-2">{plan.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {plan.features.map((feature, j) => (
-                        <li key={j} className="flex items-center gap-2">
-                          <CheckCircle className="h-5 w-5 text-primary" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                  <CardFooter>
-                    <Button
-                      className={`w-full ${plan.popular ? "bg-primary hover:bg-primary/90" : ""}`}
-                      variant={plan.popular ? "default" : "outline"}
-                    >
-                      {plan.buttonText}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-
-            <div className="mt-12 text-center">
-              <p className="text-muted-foreground mb-4">
-                Todos os planos incluem um teste gratuito de 14 dias. Não é necessário cartão de crédito.
-              </p>
-              <Link href="#" className="text-primary hover:underline">
-                Ver comparação completa dos planos →
-              </Link>
-            </div>
-          </div>
-        </section>
-
-
+        </section>   
 
         {/* Seção Chamada para Ação (CTA) */}
         <section className="py-20 bg-primary text-primary-foreground flex items-center justify-center px-4">
@@ -424,16 +310,11 @@ export default function Home() {
               Junte-se a milhares de entusiastas da moda que já descobriram seu estilo perfeito com a VestAi.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary">
-                Experimente Grátis
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent text-primary-foreground border-primary-foreground hover:bg-primary-foreground/10"
-              >
-                Agendar uma Demonstração
-              </Button>
+              <Link href="/register">
+                <Button size="lg" variant="secondary">
+                  Experimente Grátis
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
