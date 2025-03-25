@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
-import { ClothingCard } from "@/components/clothing-card"
+import { ClothingCard } from "@/components/ui/clothing-card"
 
 export default function WardrobePage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)

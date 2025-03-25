@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { Shirt, ShoppingBag, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import "./styles.css"
 
 interface ClothingCardProps {
   id: number
@@ -12,27 +13,20 @@ interface ClothingCardProps {
 }
 
 export function ClothingCard({ id, src, alt }: ClothingCardProps) {
-  const [isSelected, setIsSelected] = useState(false)
-
   return (
-    <div 
-      className="relative w-full aspect-square rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-300 hover:bg-[#ffffff]"
-      onClick={() => setIsSelected(!isSelected)}
-    >
+    <div className="clothing-card">
       <Image
         src={src}
         alt={alt}
         fill
-        className={`object-cover hover:shadow-lg transition-all duration-300 ${isSelected ? 'scale-105 blur-sm' : ''}`}
+        className="clothing-card-image"
       />
       
-      <div className={`absolute inset-0 bg-black/50 flex hover:shadow-lg items-center justify-center gap-3 transition-all duration-300 ${
-        isSelected ? 'opacity-100' : 'opacity-0'
-      }`}>
+      <div className="clothing-card-overlay">
         <Button 
           variant="secondary" 
           size="icon" 
-          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          className="clothing-card-button"
           onClick={(e) => {
             e.stopPropagation()
             // Add wardrobe action here
@@ -43,7 +37,7 @@ export function ClothingCard({ id, src, alt }: ClothingCardProps) {
         <Button 
           variant="secondary" 
           size="icon" 
-          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          className="clothing-card-button"
           onClick={(e) => {
             e.stopPropagation()
             // Add wishlist action here
@@ -54,7 +48,7 @@ export function ClothingCard({ id, src, alt }: ClothingCardProps) {
         <Button 
           variant="secondary" 
           size="icon" 
-          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          className="clothing-card-button"
           onClick={(e) => {
             e.stopPropagation()
             // Add create outfit action here
