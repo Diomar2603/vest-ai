@@ -24,6 +24,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Sidebar } from "@/components/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ClothingCard } from "@/components/ui/clothing-card"
 
 export default function ChatPage() {
   const router = useRouter()
@@ -151,18 +152,12 @@ export default function ChatPage() {
             <h3 className="text-lg font-medium mb-4">Sugestões de Looks</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {outfitSuggestions.map((outfit) => (
-                <Card key={outfit.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={outfit.src}
-                        alt={outfit.alt}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                <ClothingCard
+                  key={outfit.id}
+                  id={outfit.id}
+                  src={outfit.src}
+                  alt={outfit.alt}
+                />
               ))}
             </div>
           </div>
