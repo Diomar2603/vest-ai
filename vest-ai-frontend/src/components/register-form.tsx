@@ -61,8 +61,10 @@ export function RegisterForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [step, setStep] = useState(1);
-   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
+
   const onSubmit: SubmitHandler<FormValues> = (data) => {
+
     toast("You submitted the following values:", {
       description: (
         <pre className="mt-2 w-[100%] rounded-md bg-slate-950 p-4">

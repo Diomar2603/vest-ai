@@ -1,8 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import { Shirt, ShoppingBag, Plus } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 interface ClothingCardProps {
@@ -12,31 +12,55 @@ interface ClothingCardProps {
 }
 
 export function ClothingCard({ id, src, alt }: ClothingCardProps) {
+  const [isSelected, setIsSelected] = useState(false)
+
   return (
-    <div className="group relative cursor-pointer">
-      <Card className="overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
-        <CardContent className="p-0">
-          <div className="relative aspect-square">
-            <Image
-              src={src}
-              alt={alt}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              priority
-              className="object-cover transition-all duration-300 group-hover:blur-[2px]"
-            />
-          </div>
-        </CardContent>
-      </Card>
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
-        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 shadow-md hover:scale-110">
-          <Shirt className="h-5 w-5" />
+    <div 
+      className="relative w-full aspect-square rounded-lg overflow-hidden bg-white shadow-sm transition-all duration-300 hover:bg-[#ffffff]"
+      onClick={() => setIsSelected(!isSelected)}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className={`object-cover hover:shadow-lg transition-all duration-300 ${isSelected ? 'scale-105 blur-sm' : ''}`}
+      />
+      
+      <div className={`absolute inset-0 bg-black/50 flex hover:shadow-lg items-center justify-center gap-3 transition-all duration-300 ${
+        isSelected ? 'opacity-100' : 'opacity-0'
+      }`}>
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          onClick={(e) => {
+            e.stopPropagation()
+            // Add wardrobe action here
+          }}
+        >
+          <Shirt className="h-6 w-6" />
         </Button>
-        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 shadow-md hover:scale-110">
-          <ShoppingBag className="h-5 w-5" />
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          onClick={(e) => {
+            e.stopPropagation()
+            // Add wishlist action here
+          }}
+        >
+          <ShoppingBag className="h-6 w-6" />
         </Button>
-        <Button size="icon" variant="secondary" className="rounded-full h-10 w-10 shadow-md hover:scale-110">
-          <Plus className="h-5 w-5" />
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="h-12 w-12 rounded-full bg-white/80 hover:bg-white hover:scale-110 transition-all"
+          onClick={(e) => {
+            e.stopPropagation()
+            // Add create outfit action here
+          }}
+        >
+          <Plus className="h-6 w-6" />
         </Button>
       </div>
     </div>
