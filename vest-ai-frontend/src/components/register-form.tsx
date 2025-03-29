@@ -54,6 +54,8 @@ type FormValues = {
   // Additional Preferences
   sustainabilityPreference: string,
   skinTonePalette: string,
+  age: number,
+  ethnicity: string
 }
 
 export function RegisterForm({
@@ -61,11 +63,34 @@ export function RegisterForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [step, setStep] = useState(1);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      if (selectedColors.length < 3) {
+        setSelectedColors([...selectedColors, value]);
+      }
+    } else {
+      setSelectedColors(selectedColors.filter((color) => color !== value));
+    }
+  };
 
-    toast("You submitted the following values:", {
+  const handleStyleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      if (selectedStyles.length < 2) {
+        setSelectedStyles([...selectedStyles, value]);
+      }
+    } else {
+      setSelectedStyles(selectedStyles.filter((style) => style !== value));
+    }
+  };
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  toast("You submitted the following values:", {
       description: (
         <pre className="mt-2 w-[100%] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
@@ -79,26 +104,29 @@ export function RegisterForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
-            {step === 1 ? "Criar Conta" : "Suas Preferências de Estilo"}
+            {step === 1 ? "Criar Conta" : 
+             step === 2 ? "Suas Preferências de Estilo" : 
+             step === 3 ? "Caracteristicas pessoais" : null}
           </CardTitle>
           <CardDescription>
-            {step === 1 
-              ? "Crie uma conta preenchendo os campos abaixo"
-              : "Conte-nos sobre seu estilo para recomendações personalizadas"
+            { step === 1 ? "Crie uma conta preenchendo os campos abaixo" :
+              step === 2 ? "Conte-nos sobre seu estilo para recomendações personalizadas" :
+              step === 3 ? "Nos fale um pouco de suas caracteristicas pessoais (Todas as respostas desta pagina são opcionais)": null
             }
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-6">
-              {step === 1 ? (
+              {step === 1 ? 
+              (
                 <div className="grid gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="fullName">Nome completo</Label>
                     <Input
                       id="fullName"
                       type="text"
-                      placeholder="João da Silva"
+                      placeholder="Nome Completo"
                       {...register("fullName", { required: true })}
                     />
                     {errors?.fullName && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
@@ -136,77 +164,38 @@ export function RegisterForm({
                     <Input
                       id="phoneNumber"
                       type="tel"
-                      placeholder="(11) 98765-4321"
+                      placeholder="(11) 90000-0000"
                       {...register("phoneNumber")}
                     />
                   </div>
                   <Button 
-                    type="button" 
-                    className="w-full"
-                    onClick={() => setStep(2)}
-                  >
+                    type="button" className="w-full" onClick={() => setStep(2)}>
                     Próximo
                   </Button>
                 </div>
-              // Replace the second step content with:
-              ) : (
+              ): step === 2  ? 
+              (
                 <div className="grid gap-8">  {/* Changed from gap-6 to gap-8 */}
-                  <div className="grid gap-2">
-                    <Label>Tipo Corporal</Label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                      {...register("bodyType", { required: true })}
-                    >
-                      <option value="">Selecione seu tipo corporal</option>
-                      <option value="hourglass">Ampulheta</option>
-                      <option value="rectangle">Retangular</option>
-                      <option value="triangle">Triângulo</option>
-                      <option value="inverted-triangle">Triângulo Invertido</option>
-                      <option value="oval">Oval</option>
-                    </select>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Estilo Preferido</Label>
-                    <div className="grid grid-cols-2 gap-4">
-                      {["Casual", "Elegante", "Esportivo", "Vintage", "Minimalista"].map((style) => (
-                        <label key={style} className="flex items-center space-x-3">
-                          <div className="w-5">
-                            <Input
-                              type="checkbox"
-                              value={style}
-                              className="h-4 w-4"
-                              {...register("stylePreferences")}
-                            />
-                          </div>
-                          <span className="text-sm">{style}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Faixa de Preço</Label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                      {...register("priceRange", { required: true })}
-                    >
-                      <option value="">Selecione sua faixa de preço</option>
-                      <option value="budget">Econômico</option>
-                      <option value="moderate">Moderado</option>
-                      <option value="premium">Premium</option>
-                      <option value="luxury">Luxo</option>
-                    </select>
-                  </div>
 
                   <div className="grid gap-4">  {/* Added a section wrapper with gap-8 */}
                     <h3 className="font-semibold">Estilo e Preferências</h3>
                     
                     <div className="grid gap-4">  {/* Changed from gap-2 to gap-4 */}
                       <div className="grid gap-2">
-                        <Label>Estilo Preferido</Label>
+                        <Label>Estilo Preferido (escolha 2 que mais se identifica)</Label>
                         <div className="grid grid-cols-2 gap-4">
-                          {["Casual", "Formal", "Esportivo", "Boho", "Minimalista", "Clássico"].map((style) => (
+                          {[
+                            "Casual",
+                            "Formal",
+                            "Esportivo",
+                            "Boho",
+                            "Minimalista",
+                            "Old Money",
+                            "Streetwear",
+                            "Vintage",
+                            "Gótico",
+                            "Grunge",
+                          ].map((style) => (
                             <label key={style} className="flex items-center space-x-3">
                               <div className="w-5">
                                 <Input
@@ -214,6 +203,9 @@ export function RegisterForm({
                                   value={style}
                                   className="h-4 w-4"
                                   {...register("dressingStyle")}
+                                  checked={selectedStyles.includes(style)}
+                                  onChange={handleStyleChange}
+                                  disabled={selectedStyles.length >= 2 && !selectedStyles.includes(style)}
                                 />
                               </div>
                               <span className="text-sm">{style}</span>
@@ -225,7 +217,17 @@ export function RegisterForm({
                       <div className="grid gap-2">
                         <Label>Cores preferidas (escolha até 3)</Label>
                         <div className="grid grid-cols-3 gap-4">
-                          {["Preto", "Branco", "Azul", "Vermelho", "Verde", "Rosa", "Bege", "Marrom", "Roxo"].map((color) => (
+                          {[
+                            "Preto",
+                            "Branco",
+                            "Azul",
+                            "Vermelho",
+                            "Verde",
+                            "Rosa",
+                            "Bege",
+                            "Marrom",
+                            "Roxo",
+                          ].map((color) => (
                             <label key={color} className="flex items-center space-x-3">
                               <div className="w-5">
                                 <Input
@@ -233,28 +235,12 @@ export function RegisterForm({
                                   value={color}
                                   className="h-4 w-4"
                                   {...register("preferredColors")}
+                                  checked={selectedColors.includes(color)}
+                                  onChange={handleColorChange}
+                                  disabled={selectedColors.length >= 3 && !selectedColors.includes(color)}
                                 />
                               </div>
                               <span className="text-sm">{color}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <Label>Padrões preferidos</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                          {["Liso", "Listrado", "Estampado", "Xadrez", "Poá", "Floral"].map((pattern) => (
-                            <label key={pattern} className="flex items-center space-x-3">
-                              <div className="w-5">
-                                <Input
-                                  type="checkbox"
-                                  value={pattern}
-                                  className="h-4 w-4"
-                                  {...register("preferredPatterns")}
-                                />
-                              </div>
-                              <span className="text-sm">{pattern}</span>
                             </label>
                           ))}
                         </div>
@@ -272,7 +258,7 @@ export function RegisterForm({
                         {...register("clothingSize")}
                       >
                         <option value="">Selecione seu tamanho</option>
-                        {["PP", "P", "M", "G", "GG", "XG"].map((size) => (
+                        {["PP", "P", "M", "G", "GG", "XG", "XGG", "3G", "4G"].map((size) => (
                           <option key={size} value={size}>{size}</option>
                         ))}
                       </select>
@@ -285,29 +271,61 @@ export function RegisterForm({
                         {...register("fitPreference")}
                       >
                         <option value="">Selecione sua preferência</option>
-                        <option value="fitted">Ajustado ao corpo</option>
-                        <option value="loose">Mais solto</option>
-                        <option value="mixed">Depende da peça</option>
+                        <option value="Slim">Slim Fit</option>
+                        <option value="Regular">Regular Fit</option>
+                        <option value="Relaxed">Loose Fit / Relaxed Fit</option>
+                        <option value="Oversized">Oversized</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="grid gap-2">
-                    <Label>Tom de pele</Label>
-                    <select 
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                      {...register("skinTonePalette")}
-                    >
-                      <option value="">Selecione seu subtom</option>
-                      <option value="cool">Frio (subtom rosa, vermelho ou azul)</option>
-                      <option value="warm">Quente (subtom dourado, amarelo ou pêssego)</option>
-                      <option value="neutral">Neutro (mistura equilibrada)</option>
-                    </select>
+                    <div className="flex gap-4 pt-4">
+                    <Button type="button"  variant="outline"  onClick={() => setStep(1)}>
+                        Voltar
+                      </Button>
+                      <Button type="submit" className="flex-1" onClick={() => setStep(3)}>
+                        Próximo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ): step === 3 ?
+              (
+                <div className="grid gap-8">  {/* Changed from gap-6 to gap-8 */}
+
+                  <div className="grid gap-4">  {/* Added a section wrapper with gap-8 */}
+                    
+                    <div className="grid gap-4">  {/* Changed from gap-2 to gap-4 */}
+
+                      <div className="grid gap-2">
+                        <Label htmlFor="age">Idade</Label>
+                        <Input
+                          id="age"
+                          type="number"
+                          placeholder="Sua idade"
+                          {...register("age", { required: false })}
+                        />
+                      </div>
+                  
+                      <div className="grid gap-2">
+                        <Label>A qual etinia se identifica</Label>
+                        <select 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        {...register("ethnicity")}
+                      >
+                        <option value="">Selecione sua etinia</option>
+                        {["Branca", "Parda", "Preta", "Amarela", "Indígena"].map((size) => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="grid gap-2">
                     <div className="flex gap-4 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                      <Button type="button" variant="outline" onClick={() => setStep(2)}>
                         Voltar
                       </Button>
                       <Button type="submit" className="flex-1">
@@ -316,7 +334,8 @@ export function RegisterForm({
                     </div>
                   </div>
                 </div>
-              )}
+              )
+              : null}
             </div>
           </form>
         </CardContent>
