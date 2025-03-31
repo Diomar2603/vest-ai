@@ -41,6 +41,7 @@ export default function ChatPage() {
     { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 2" },
     { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 3" },
     { id: 4, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 4" },
+    { id: 5, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 5" },
   ])
 
   const handleSendMessage = () => {
@@ -84,8 +85,7 @@ export default function ChatPage() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4">
           <div className="md:hidden">
             {/* Placeholder for mobile sidebar toggle */}
@@ -108,9 +108,9 @@ export default function ChatPage() {
           </div>
         </header>
 
-        {/* Chat Area */}
-        <div className="flex-1 overflow-auto p-4">
-          <div className="max-w-3xl mx-auto flex flex-col gap-4">
+        {/* Upper Scrollable Area - Messages */}
+        <div className="h-[calc(42vh-48px)] overflow-y-auto">
+          <div className="max-w-3xl mx-auto flex flex-col gap-4 p-4">
             {messages.map((msg, index) => (
               <div 
                 key={index} 
@@ -130,25 +130,27 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Message Input */}
-        <div className="p-4 border-t">
-          <div className="max-w-3xl mx-auto flex gap-2">
-            <Input
-              placeholder="Digite sua mensagem..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1"
-            />
-            <Button onClick={handleSendMessage}>
-              <Send className="h-4 w-4" />
-            </Button>
+        {/* Fixed Input Bar */}
+        <div className="h-20 border-y bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="max-w-3xl mx-auto py-4 px-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Digite sua mensagem..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                className="flex-1"
+              />
+              <Button onClick={handleSendMessage}>
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Image Grid */}
-        <div className="p-4 border-t">
-          <div className="max-w-4xl mx-auto">
+        {/* Lower Scrollable Area - Suggestions */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto p-4">
             <h3 className="text-lg font-medium mb-4">Sugestões de Looks</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {outfitSuggestions.map((outfit) => (
@@ -157,6 +159,7 @@ export default function ChatPage() {
                   id={outfit.id}
                   src={outfit.src}
                   alt={outfit.alt}
+                  buttons={["wardrobe", "wishlist", "outfit"]}
                 />
               ))}
             </div>

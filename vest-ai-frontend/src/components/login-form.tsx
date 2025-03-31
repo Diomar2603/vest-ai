@@ -82,7 +82,7 @@ export function LoginForm({
               alt="Image"
               layout="fill"
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         </CardContent>
