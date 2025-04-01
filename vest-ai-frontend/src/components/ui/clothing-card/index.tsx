@@ -16,13 +16,22 @@ interface ClothingCardProps {
   src: string
   alt: string
   buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove'>
+  onAddToOutfit?: (item: { id: number; src: string; alt: string }) => void
+  onRemoveFromWardrobe?: (id: number) => void
 }
 
-export function ClothingCard({ id, src, alt, buttons = ['wardrobe', 'wishlist', 'outfit'] }: ClothingCardProps) {
+export function ClothingCard({ 
+  id, 
+  src, 
+  alt, 
+  buttons = [], 
+  onAddToOutfit,
+  onRemoveFromWardrobe 
+}: ClothingCardProps) {
   const buttonConfig = {
     wardrobe: {
       icon: <Shirt className="h-6 w-6" />,
-      tooltip: "Adicionar ao meu guarda roupa",
+      tooltip: "Adicionar ao guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
         // Add wardrobe action here
@@ -38,18 +47,18 @@ export function ClothingCard({ id, src, alt, buttons = ['wardrobe', 'wishlist', 
     },
     outfit: {
       icon: <Plus className="h-6 w-6" />,
-      tooltip: "Criar novo Outfit",
+      tooltip: "Adicionar ao outfit",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add create outfit action here
+        onAddToOutfit?.({ id, src, alt })
       }
     },
     remove: {
       icon: <Trash2 className="h-6 w-6" />,
-      tooltip: "Remover do meu guarda roupa",
+      tooltip: "Remover do guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add remove from wardrobe action here
+        onRemoveFromWardrobe?.(id)
       }
     }
   }

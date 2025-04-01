@@ -1,30 +1,29 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 // Add Users to the imports at the top
 import { 
-  Sparkles, 
   Send, 
   User, 
-  Shirt, 
-  ShoppingBag, 
-  Settings, 
-  LogOut,
   Menu,
   X,
-  Users
+  Plus  // Add this import
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { Sidebar } from "@/components/sidebar"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { ClothingCard } from "@/components/ui/clothing-card"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet"
 
 export default function ChatPage() {
   const router = useRouter()
@@ -37,8 +36,8 @@ export default function ChatPage() {
   
   // Mock data for the image grid
   const [outfitSuggestions, setOutfitSuggestions] = useState([
-    { id: 1, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 1" },
-    { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 2" },
+    { id: 1, src: "/images/black-tshirt.jpg?height=300&width=300", alt: "Outfit 1" },
+    { id: 2, src: "/images/blue-jeans-pants.jpg?height=300&width=300", alt: "Outfit 2" },
     { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 3" },
     { id: 4, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 4" },
     { id: 5, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 5" },
@@ -62,6 +61,91 @@ export default function ChatPage() {
     }, 1000)
   }
 
+  const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
+  const [outfitItems, setOutfitItems] = useState<Array<{ id: number; src: string; alt: string }>>([])
+
+  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
+    const isDuplicate = outfitItems.some(existingItem => existingItem.id === item.id)
+    
+    if (isDuplicate) {
+      toast.error("Este item já faz parte do outfit atual.")
+      return
+    }
+
+    setOutfitItems(prev => [...prev, item])
+    setIsOutfitDrawerOpen(true)
+  }
+
+  const handleRemoveFromOutfit = (itemId: number) => {
+    setOutfitItems(prev => prev.filter(item => item.id !== itemId))
+  }
+
+  // Add this state for outfit name
+  const [outfitName, setOutfitName] = useState("")
+
+  const handleCreateOutfit = () => {
+    if (!outfitName.trim()) {
+      toast.error("Por favor, dê um nome ao seu outfit")
+      return
+    }
+    
+    // Add logic to save the outfit with its name
+    setOutfitItems([])
+    setOutfitName("")
+    setIsOutfitDrawerOpen(false)
+    toast.success("Outfit criado com sucesso!")
+  }
+
+  // In the Sheet component, add this after SheetTitle:
+  <SheetContent side="right" className="w-full sm:w-[400px]">
+    <SheetHeader>
+      <SheetTitle>Criar Novo Outfit</SheetTitle>
+    </SheetHeader>
+    
+    <div className="flex flex-col gap-4">
+      <div className="py-4">
+        <Input
+          placeholder="Nome do outfit..."
+          value={outfitName}
+          onChange={(e) => setOutfitName(e.target.value)}
+        />
+      </div>
+      
+      <div className="flex-1 overflow-y-auto">
+        <div className="grid grid-cols-2 gap-4">
+          {outfitItems.map((item) => (
+            <div key={item.id} className="relative">
+              <Image
+                src={item.src}
+                alt={item.alt}
+                width={150}
+                height={150}
+                className="rounded-md"
+              />
+              <Button
+                variant="destructive"
+                size="icon"
+                className="absolute top-1 right-1"
+                onClick={() => handleRemoveFromOutfit(item.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <SheetFooter>
+      <Button 
+        onClick={handleCreateOutfit}
+        disabled={outfitItems.length === 0}
+        className="w-full"
+      >
+        Criar Outfit
+      </Button>
+    </SheetFooter>
+  </SheetContent>
   return (
     <div className="flex h-screen bg-background">
       {/* Mobile Sidebar Toggle */}
@@ -94,17 +178,18 @@ export default function ChatPage() {
           <div className="flex-1 md:flex-none md:pl-16"></div>
           
           <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsOutfitDrawerOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Criar Outfit
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => router.push("/account")}>
               Minha Conta
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={() => router.push("/account")}>
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-            </Button>
+            </Button>           
           </div>
         </header>
 
@@ -160,12 +245,76 @@ export default function ChatPage() {
                   src={outfit.src}
                   alt={outfit.alt}
                   buttons={["wardrobe", "wishlist", "outfit"]}
+                  onAddToOutfit={handleAddToOutfit}
                 />
               ))}
             </div>
           </div>
         </div>
       </div>
+      {/* Outfit Creation Drawer */}
+      <Sheet open={isOutfitDrawerOpen} onOpenChange={setIsOutfitDrawerOpen}>
+        <SheetContent side="right" className="w-full sm:w-[400px] flex flex-col">
+          <SheetHeader>
+            <SheetTitle>Criar Novo Outfit</SheetTitle>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto py-4">
+            <div className="grid grid-cols-2 gap-4">
+              {outfitItems.map((item) => (
+                <div key={item.id} className="relative">
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    width={150}
+                    height={150}
+                    className="rounded-md"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1"
+                    onClick={() => handleRemoveFromOutfit(item.id)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4">
+            <div className="px-4">
+              <Input
+                placeholder="Nome do outfit..."
+                value={outfitName}
+                onChange={(e) => setOutfitName(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            
+            <SheetFooter className="flex gap-2">
+              <Button 
+                onClick={handleCreateOutfit}
+                disabled={outfitItems.length === 0}
+                className="flex-1"
+              >
+                Criar Outfit
+              </Button>
+              <Button 
+                onClick={() => {
+                  setOutfitItems([])
+                  setOutfitName("")
+                }}
+                variant="outline"
+                disabled={outfitItems.length === 0}
+              >
+                Limpar
+              </Button>
+            </SheetFooter>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

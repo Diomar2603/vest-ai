@@ -10,6 +10,17 @@ import { ClothingCard } from "@/components/ui/clothing-card"
 export default function WardrobePage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
+  // Add handlers for clothing card actions
+  const handleRemoveFromWardrobe = (itemId: number) => {
+    // TODO: Implement remove logic
+    console.log('Remove item:', itemId)
+  }
+
+  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
+    // TODO: Implement outfit logic
+    console.log('Add to outfit:', item)
+  }
+  
   const sections = [
     {
       id: 'shirts',
@@ -89,7 +100,9 @@ export default function WardrobePage() {
                         id={item.id}
                         src={item.src}
                         alt={item.alt}
-                        buttons={['remove', 'wishlist', 'outfit']}
+                        buttons={["remove", "outfit"]}
+                        onRemoveFromWardrobe={() => handleRemoveFromWardrobe(item.id)}
+                        onAddToOutfit={() => handleAddToOutfit(item)}
                       />
                     ))}
                   </div>
