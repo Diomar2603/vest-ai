@@ -1,20 +1,61 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
-import { Shirt, ShoppingBag, Plus } from "lucide-react"
+import { Shirt, ShoppingBag, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import "./styles.css"
 
 interface ClothingCardProps {
   id: number
   src: string
   alt: string
+  buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove'>
 }
 
-export function ClothingCard({ id, src, alt }: ClothingCardProps) {
+export function ClothingCard({ id, src, alt, buttons = ['wardrobe', 'wishlist', 'outfit'] }: ClothingCardProps) {
+  const buttonConfig = {
+    wardrobe: {
+      icon: <Shirt className="h-6 w-6" />,
+      tooltip: "Adicionar ao meu guarda roupa",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        // Add wardrobe action here
+      }
+    },
+    wishlist: {
+      icon: <ShoppingBag className="h-6 w-6" />,
+      tooltip: "Adicionar à lista de desejos",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        // Add wishlist action here
+      }
+    },
+    outfit: {
+      icon: <Plus className="h-6 w-6" />,
+      tooltip: "Criar novo Outfit",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        // Add create outfit action here
+      }
+    },
+    remove: {
+      icon: <Trash2 className="h-6 w-6" />,
+      tooltip: "Remover do meu guarda roupa",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        // Add remove from wardrobe action here
+      }
+    }
+  }
+
   return (
-    <div className="clothing-card">
+    <div className="clothing-card cursor-pointer">
       <Image
         src={src}
         alt={alt}
@@ -23,39 +64,25 @@ export function ClothingCard({ id, src, alt }: ClothingCardProps) {
       />
       
       <div className="clothing-card-overlay">
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          className="clothing-card-button"
-          onClick={(e) => {
-            e.stopPropagation()
-            // Add wardrobe action here
-          }}
-        >
-          <Shirt className="h-6 w-6" />
-        </Button>
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          className="clothing-card-button"
-          onClick={(e) => {
-            e.stopPropagation()
-            // Add wishlist action here
-          }}
-        >
-          <ShoppingBag className="h-6 w-6" />
-        </Button>
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          className="clothing-card-button"
-          onClick={(e) => {
-            e.stopPropagation()
-            // Add create outfit action here
-          }}
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
+        <TooltipProvider>
+          {buttons.map((buttonType) => (
+            <Tooltip key={buttonType}>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="secondary" 
+                  size="icon" 
+                  className="clothing-card-button"
+                  onClick={buttonConfig[buttonType].onClick}
+                >
+                  {buttonConfig[buttonType].icon}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{buttonConfig[buttonType].tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </TooltipProvider>
       </div>
     </div>
   )

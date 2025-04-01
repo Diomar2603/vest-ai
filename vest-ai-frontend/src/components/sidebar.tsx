@@ -7,7 +7,8 @@ import {
   Shirt, 
   ShoppingBag, 
   Menu,
-  X
+  X,
+  Layers
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -57,6 +58,10 @@ export function Sidebar({
                 <Shirt className="h-5 w-5" />
                 <span>Guarda Roupa</span>
               </Link>
+              <Link href="/outfits" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 text-sidebar-foreground">
+                <Layers className="h-5 w-5" />
+                <span>Outfits</span>
+              </Link>
               <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 text-sidebar-foreground">
                 <ShoppingBag className="h-5 w-5" />
                 <span>Lista de Desejos</span>
@@ -104,6 +109,10 @@ export function Sidebar({
           <Link href="/wardrobe" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 text-sidebar-foreground">
             <Shirt className="h-5 w-5" />
             {isSidebarOpen && <span>Guarda Roupa</span>}
+          </Link>
+          <Link href="/outfits" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 text-sidebar-foreground">
+            <Layers className="h-5 w-5" />
+            {isSidebarOpen && <span>Outfits</span>}
           </Link>
           <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 text-sidebar-foreground">
             <ShoppingBag className="h-5 w-5" />
