@@ -21,7 +21,7 @@ import {
   CreditCardIcon,
   CheckCircle2,
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -38,11 +38,11 @@ export default function AccountPage() {
 
   // Estado dos dados do usuário
   const [userData, setUserData] = useState({
-    name: "Alex Johnson",
-    email: "alex@example.com",
-    phone: "+1 (555) 123-4567",
+    name: "Victor",
+    email: "vic@example.com",
+    phone: "11 9123-4567",
     avatar: "/placeholder.svg?height=100&width=100",
-    joinDate: "15 de janeiro de 2025",
+    joinDate: "01/04/2025",
   })
 
   // Estado das senhas
@@ -54,42 +54,8 @@ export default function AccountPage() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const [profileImage, setProfileImage] = useState<string | null>(null)
 
-  // Lidar com o upload da foto de perfil
-  const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setIsUploading(true)
-
-    // Verificar tamanho do arquivo (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast("Arquivo muito grande",{
-        description: "Por favor, selecione uma imagem com menos de 5MB",
-      })
-      setIsUploading(false)
-      return
-    }
-
-    // Verificar tipo do arquivo
-    if (!file.type.startsWith("image/")) {
-      toast("Tipo de arquivo inválido",{
-        description: "Por favor, selecione um arquivo de imagem",
-      })
-      setIsUploading(false)
-      return
-    }
-
-    // Criar uma URL para a imagem
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setProfileImage(e.target?.result as string)
-      setIsUploading(false)
-    }
-    reader.readAsDataURL(file)
-  }
-
+  
   // Salvar alterações do perfil
   const saveProfileChanges = () => {
     // Atualizar dados do usuário com os valores do formulário
@@ -98,7 +64,7 @@ export default function AccountPage() {
       name: (document.getElementById("name") as HTMLInputElement).value,
       email: (document.getElementById("email") as HTMLInputElement).value,
       phone: (document.getElementById("phone") as HTMLInputElement).value,
-      avatar: profileImage || prev.avatar,
+      avatar: prev.avatar,
     }))
 
     toast("Perfil atualizado", {
@@ -159,7 +125,6 @@ export default function AccountPage() {
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src={profileImage || userData.avatar} />
                 <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
               </Avatar>
             </Button>
@@ -171,7 +136,7 @@ export default function AccountPage() {
         <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight">Configurações da Conta</h1>
-            <p className="text-muted-foreground">Gerencie as configurações da sua conta e plano de assinatura</p>
+            <p className="text-muted-foreground">Gerencie as configurações da sua conta</p>
           </div>
 
           <Tabs defaultValue="profile" className="w-full">
@@ -186,41 +151,26 @@ export default function AccountPage() {
                 <Card className="flex-1">
                   <CardHeader>
                     <CardTitle>Informações Pessoais</CardTitle>
-                    <CardDescription>Atualize seus dados pessoais e foto de perfil</CardDescription>
+                    <CardDescription>Atualize seus dados pessoais</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex flex-col items-center gap-4 mb-6">
                       <div className="relative group">
                         <Avatar className="h-24 w-24 border-2 border-primary">
-                          <AvatarImage src={profileImage || userData.avatar} />
                           <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div
                           className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                          onClick={() => fileInputRef.current?.click()}
                         >
-                          <Upload className="h-6 w-6 text-white" />
                         </div>
                         <input
                           type="file"
                           ref={fileInputRef}
                           className="hidden"
                           accept="image/*"
-                          onChange={handleProfilePictureUpload}
                         />
                       </div>
-                      {profileImage && (
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => setProfileImage(null)}>
-                            <X className="h-4 w-4 mr-1" /> Cancelar
-                          </Button>
-                        </div>
-                      )}
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Clique para enviar uma nova foto de perfil</p>
-                      </div>
                     </div>
-
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -356,26 +306,6 @@ export default function AccountPage() {
           </Tabs>
         </div>
       </main>
-
-      <footer className="border-t py-6 md:py-0">
-        <div className="container flex flex-col md:h-24 items-center md:flex-row md:justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <p className="text-sm text-muted-foreground">© 2025 VestAI. Todos os direitos reservados.</p>
-          </div>
-          <div className="flex items-center gap-4 md:gap-6 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-foreground">
-              Termos
-            </Link>
-            <Link href="#" className="hover:text-foreground">
-              Privacidade
-            </Link>
-            <Link href="#" className="hover:text-foreground">
-              Contato
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
