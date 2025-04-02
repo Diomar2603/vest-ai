@@ -146,9 +146,7 @@ export default function Home() {
                     </p>
                     <ul className="space-y-2">
                       {[
-                        "Questionário rápido de 5 minutos",
-                        "Envie fotos de inspiração",
-                        "Defina suas preferências de orçamento",
+                        "Questionário rápido de 5 minutos"
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2">
                           <CheckCircle className="h-5 w-5 text-primary" />
@@ -178,7 +176,6 @@ export default function Home() {
                     </p>
                     <ul className="space-y-2">
                       {[
-                        "Análise do formato do corpo",
                         "Correspondência de paleta de cores",
                         "Detecção de preferências de estilo",
                       ].map((item, i) => (
@@ -212,7 +209,6 @@ export default function Home() {
                       {[
                         "Galeria personalizada de looks",
                         "Opções para combinar peças",
-                        "Links diretos para compra",
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2">
                           <CheckCircle className="h-5 w-5 text-primary" />
@@ -235,72 +231,6 @@ export default function Home() {
             </Tabs>
           </div>
         </section>
-
-        {/* Seção de Depoimentos */}
-        <section id="testimonials" className="py-20 bg-muted/50 flex items-center justify-center px-4">
-          <div className="container">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">O Que Nossos Usuários Dizem</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Milhares de pessoas transformaram seu estilo com a VestAi.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  name: "Sarah Johnson",
-                  role: "Executiva de Marketing",
-                  image: "/images/icon-person.jpg",
-                  quote:
-                    "A VestAi transformou completamente meu guarda-roupa. Eu costumava perder horas escolhendo roupas, mas agora tenho looks perfeitos para todas as ocasiões!",
-                },
-                {
-                  name: "Michael Chen",
-                  role: "Desenvolvedor de Software",
-                  image: "/images/icon-person.jpg",
-                  quote:
-                    "Como alguém que nunca soube o que ficava bem em mim, a VestAi foi um divisor de águas. As recomendações são precisas para o meu tipo de corpo e preferências de estilo.",
-                },
-                {
-                  name: "Aisha Patel",
-                  role: "Estudante Universitária",
-                  image: "/images/icon-person.jpg",
-                  quote:
-                    "Com um orçamento de estudante, eu precisava fazer escolhas de moda inteligentes. A VestAi me ajudou a montar um guarda-roupa versátil com peças que combinam perfeitamente.",
-                },
-              ].map((testimonial, i) => (
-                <Card key={i} className="relative">
-                  <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <Image
-                        src={testimonial.image || "/placeholder.svg"}
-                        alt={testimonial.name}
-                        width={60}
-                        height={60}
-                        className="rounded-full max-w-12 max-h-12 object-cover" 
-                      />
-                      <div>
-                        <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                        <CardDescription>{testimonial.role}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex mb-2">
-                      {Array(5)
-                        .fill(0)
-                        .map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-primary text-primary" />
-                        ))}
-                    </div>
-                    <p className="text-muted-foreground">{testimonial.quote}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>   
 
         {/* Seção Chamada para Ação (CTA) */}
         <section className="py-20 bg-primary text-primary-foreground flex items-center justify-center px-4">
@@ -333,7 +263,7 @@ export default function Home() {
                 Recomendações de moda impulsionadas por IA, personalizadas para o seu estilo único.
               </p>
               <div className="flex gap-4">
-                {["Twitter", "Instagram", "Facebook", "LinkedIn"].map((social, i) => (
+                {["Instagram", "LinkedIn"].map((social, i) => (
                   <Link key={i} href="#" className="text-muted-foreground hover:text-primary">
                     {social}
                   </Link>
@@ -344,7 +274,7 @@ export default function Home() {
             <div>
               <h3 className="font-medium mb-4">Produto</h3>
               <ul className="space-y-2">
-                {["Recursos", "Como Funciona", "Preços", "FAQ", "Depoimentos"].map((item, i) => (
+                {["Recursos", "Como Funciona"].map((item, i) => (
                   <li key={i}>
                     <Link href="#" className="text-muted-foreground hover:text-primary">
                       {item}
@@ -357,7 +287,7 @@ export default function Home() {
             <div>
               <h3 className="font-medium mb-4">Empresa</h3>
               <ul className="space-y-2">
-                {["Sobre Nós", "Blog", "Carreiras", "Imprensa", "Contato"].map((item, i) => (
+                {["Sobre Nós", "Contato"].map((item, i) => (
                   <li key={i}>
                     <Link href="#" className="text-muted-foreground hover:text-primary">
                       {item}
@@ -370,7 +300,7 @@ export default function Home() {
             <div>
               <h3 className="font-medium mb-4">Legal</h3>
               <ul className="space-y-2">
-                {["Termos de Serviço", "Política de Privacidade", "Política de Cookies", "GDPR"].map((item, i) => (
+                {["Termos de Serviço", "Política de Privacidade"].map((item, i) => (
                   <li key={i}>
                     <Link href="#" className="text-muted-foreground hover:text-primary">
                       {item}
