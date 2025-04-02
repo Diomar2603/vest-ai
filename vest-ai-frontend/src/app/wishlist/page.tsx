@@ -10,7 +10,7 @@ import { ClothingCard } from "@/components/ui/clothing-card"
 export default function WishlistPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [wishlistItems] = useState([
-    { id: 1, src: "/images/black-tshirt.jpg?height=300&width=300", alt: "Item 1" },
+    { id: 1, src: "https://media.istockphoto.com/id/483960103/pt/foto/t-shirt-preta-em-branco-à-frente-com-traçado-de-recorte.jpg?s=2048x2048&w=is&k=20&c=a_H5M2ukApXL_j5aoY3ABMAIMvbUoejjqBdUPYWOf7Y=", alt: "Item 1" },
     { id: 2, src: "https://cdn.pixabay.com/photo/2024/05/05/04/59/ai-generated-8740190_1280.png", alt: "Item 2" },
     { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Item 3" },
     { id: 4, src: "/placeholder.svg?height=300&width=300", alt: "Item 4" },
