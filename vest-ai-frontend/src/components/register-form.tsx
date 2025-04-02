@@ -56,6 +56,8 @@ type FormValues = {
   age: number;
   ethnicity: string;
   hasObesity: boolean;
+  salaryRange: number;
+  hobbies: string[];
 };
 
 export function RegisterForm({
@@ -65,6 +67,8 @@ export function RegisterForm({
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedHobies, setSselectedHobies] = useState<string[]>([]);
+
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormValues>();
 
   const password = watch("password");
@@ -88,6 +92,17 @@ export function RegisterForm({
       }
     } else {
       setSelectedStyles(selectedStyles.filter((style) => style !== value));
+    }
+  };
+
+  const handleHobiesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      if (selectedHobies.length < 5) {
+        setSselectedHobies([...selectedHobies, value]);
+      }
+    } else {
+      setSselectedHobies(selectedHobies.filter((hobie) => hobie !== value));
     }
   };
 
@@ -372,6 +387,7 @@ export function RegisterForm({
                           ))}
                         </select>
                       </div>
+
                       <div className="grid gap-2">
                         <div className="flex items-center space-x-2">
                           <Label htmlFor="hasObesity" className="mr-2">Você se considera/é obeso(a)?</Label>
@@ -383,6 +399,70 @@ export function RegisterForm({
                           />
                         </div>
                       </div>
+
+                      <div className="grid gap-2">
+                        <Label>Hobbies preferidos (escolha até 4)</Label>
+                        <div className="grid grid-cols-2 gap-4">
+                          {[
+                            "Leitura",
+                            "Viagens",
+                            "Cozinhar",
+                            "Exercícios físicos",
+                            "Pintura",
+                            "Desenho",
+                            "Música",
+                            "Fotografia",
+                            "Jardinagem",
+                            "Caminhadas",
+                            "Videogames",
+                            "Artesanato",
+                            "Colecionismo",
+                            "Meditação",
+                            "Voluntariado",
+                            "Esportes",
+                            "Estudo de línguas",
+                            "Modelismo",
+                            "Criação de conteúdo online",
+                            "Jogos de tabuleiro"
+                            ].map((hobie) => (
+                            <label key={hobie} className="flex items-center space-x-3">
+                              <div className="w-5">
+                                <Input
+                                  type="checkbox"
+                                  value={hobie}
+                                  className="h-4 w-4"
+                                  {...register("hobbies")}
+                                  checked={selectedHobies.includes(hobie)}
+                                  onChange={handleHobiesChange}
+                                  disabled={
+                                    selectedHobies.length >= 5 && !selectedHobies.includes(hobie)
+                                  }
+                                />
+                              </div>
+                              <span className="text-sm">{hobie}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-2">
+                      <Label>Faixa Salarial</Label>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        {...register("salaryRange")}
+                      >
+                        <option value="0">Selecione sua faixa salarial</option>
+                        <option value="1">Menos de R$ 1.500</option>
+                        <option value="2">R$ 1.500 - R$ 3.000</option>
+                        <option value="3">R$ 3.000 - R$ 5.000</option>
+                        <option value="4">R$ 5.000 - R$ 10.000</option>
+                        <option value="5">R$ 10.000 - R$ 20.000</option>
+                        <option value="6">R$ 20.000 - R$ 50.000</option>
+                        <option value="7">Acima de R$ 50.000</option>
+                      </select>
+                    </div>
+
+                      
                     </div>
                   </div>
 
