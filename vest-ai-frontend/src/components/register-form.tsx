@@ -401,7 +401,7 @@ export function RegisterForm({
                       </div>
 
                       <div className="grid gap-2">
-                        <Label>Hobbies preferidos (escolha até 4)</Label>
+                        <Label>Hobbies preferidos (escolha até 5)</Label>
                         <div className="grid grid-cols-2 gap-4">
                           {[
                             "Leitura",
