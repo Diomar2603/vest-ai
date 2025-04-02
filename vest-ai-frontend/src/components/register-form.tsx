@@ -1,62 +1,62 @@
 "use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SubmitHandler, useForm } from "react-hook-form";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SubmitHandler, useForm, FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
-import { useState } from "react"
+import { useState } from "react";
 
 // Update FormValues type
 type FormValues = {
-  fullName: string,
-  email: string,
-  password: string,
-  confirmPassword: string,
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
   // Optional but recommended
-  phoneNumber?: string,
+  phoneNumber?: string;
   // New style preference fields
-
-  dressingStyle: string[],
-  preferredColors: string[],
-  stylePreferences: string[],
-  priceRange: string,
-  preferredPatterns: string[],
-  followsTrends: string,
+  dressingStyle: string[];
+  preferredColors: string[];
+  stylePreferences: string[];
+  priceRange: string;
+  preferredPatterns: string[];
+  followsTrends: string;
   
   // Clothes and Fabrics
-  commonClothingTypes: string[],
-  preferredFabrics: string[],
-  avoidedFabrics: string[],
+  commonClothingTypes: string[];
+  preferredFabrics: string[];
+  avoidedFabrics: string[];
   
   // Fit and Size
-  clothingSize: string,
-  fitPreference: string,
-  bodyType: string,
+  clothingSize: string;
+  fitPreference: string;
+  bodyType: string;
   
   // Occasions
-  occasionNeeds: string[],
-  formalStyle: string,
-  casualStyle: string[],
+  occasionNeeds: string[];
+  formalStyle: string;
+  casualStyle: string[];
   
   // Accessories
-  commonAccessories: string[],
-  commonShoeTypes: string[],
+  commonAccessories: string[];
+  commonShoeTypes: string[];
   
   // Additional Preferences
-  sustainabilityPreference: string,
-  skinTonePalette: string,
-  age: number,
-  ethnicity: string
-}
+  sustainabilityPreference: string;
+  skinTonePalette: string;
+  age: number;
+  ethnicity: string;
+  hasObesity: boolean;
+};
 
 export function RegisterForm({
   className,
@@ -65,7 +65,9 @@ export function RegisterForm({
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormValues>();
+
+  const password = watch("password");
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -90,13 +92,30 @@ export function RegisterForm({
   };
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-  toast("You submitted the following values:", {
+    toast("You submitted the following values:", {
       description: (
         <pre className="mt-2 w-[100%] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
-    })
+    });
+  };
+
+  const onSubmitError = (errors: FieldErrors<FormValues>) => {
+    const messages = Object.entries(errors).map(([field, error]) => {
+      return `• ${error?.message}`;
+    });
+
+    toast("Erros no formulário", {
+      description: (
+        <div className="mt-2 space-y-1">
+          {messages.map((msg, index) => (
+            <p key={index}>{msg}</p>
+          ))}
+        </div>
+      ),
+      duration: 6000,
+    });
   };
 
   return (
@@ -104,22 +123,28 @@ export function RegisterForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
-            {step === 1 ? "Criar Conta" : 
-             step === 2 ? "Suas Preferências de Estilo" : 
-             step === 3 ? "Caracteristicas pessoais" : null}
+            {step === 1
+              ? "Criar Conta"
+              : step === 2
+              ? "Suas Preferências de Estilo"
+              : step === 3
+              ? "Informações pessoais"
+              : null}
           </CardTitle>
           <CardDescription>
-            { step === 1 ? "Crie uma conta preenchendo os campos abaixo" :
-              step === 2 ? "Conte-nos sobre seu estilo para recomendações personalizadas" :
-              step === 3 ? "Nos fale um pouco de suas caracteristicas pessoais (Todas as respostas desta pagina são opcionais)": null
-            }
+            {step === 1
+              ? "Crie uma conta preenchendo os campos abaixo"
+              : step === 2
+              ? "Conte-nos sobre seu estilo para recomendações personalizadas"
+              : step === 3
+              ? "Nos fale um pouco de suas caracteristicas pessoais (Todas as respostas desta pagina são opcionais)"
+              : null}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit, onSubmitError)}>
             <div className="grid gap-6">
-              {step === 1 ? 
-              (
+              {step === 1 ? (
                 <div className="grid gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="fullName">Nome completo</Label>
@@ -127,9 +152,13 @@ export function RegisterForm({
                       id="fullName"
                       type="text"
                       placeholder="Nome Completo"
-                      {...register("fullName", { required: true })}
+                      {...register("fullName", { required: "O nome é obrigatório" })}
                     />
-                    {errors?.fullName && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
+                    {errors?.fullName && (
+                      <CardDescription className="text-red-500">
+                        Campo obrigatório
+                      </CardDescription>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -137,27 +166,43 @@ export function RegisterForm({
                       id="email"
                       type="email"
                       placeholder="m@example.com"
-                      {...register("email", { required: true })}
+                      {...register("email", { required: "O email é obrigatório" })}
                     />
-                    {errors?.email && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
+                    {errors?.email && (
+                      <CardDescription className="text-red-500">
+                        Campo obrigatório
+                      </CardDescription>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="password">Senha</Label>
                     <Input
                       id="password"
                       type="password"
-                      {...register("password", { required: true, minLength: 8 })}
+                      {...register("password", { required: "A senha é obrigatória", minLength: 8 })}
                     />
-                    {errors?.password && <CardDescription className="text-red-500">Senha deve ter no mínimo 8 caracteres</CardDescription>}
+                    {errors?.password && (
+                      <CardDescription className="text-red-500">
+                        Senha deve ter no mínimo 8 caracteres
+                      </CardDescription>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="confirmPassword">Confirmar Senha</Label>
                     <Input
                       id="confirmPassword"
                       type="password"
-                      {...register("confirmPassword", { required: true  })}
+                      {...register("confirmPassword", {
+                        required: "Confirmar a senha é obrigatório",
+                        validate: (value) =>
+                          value === password || "As senhas não coincidem",
+                      })}
                     />
-                    {errors?.confirmPassword && <CardDescription className="text-red-500">As senhas devem ser iguais</CardDescription>}
+                    {errors?.confirmPassword && (
+                      <CardDescription className="text-red-500">
+                        {errors.confirmPassword.message}
+                      </CardDescription>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="phoneNumber">Telefone (opcional)</Label>
@@ -168,19 +213,20 @@ export function RegisterForm({
                       {...register("phoneNumber")}
                     />
                   </div>
-                  <Button 
-                    type="button" className="w-full" onClick={() => setStep(2)}>
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={handleSubmit(() => setStep(2), onSubmitError)}
+                  >
                     Próximo
                   </Button>
                 </div>
-              ): step === 2  ? 
-              (
-                <div className="grid gap-8">  {/* Changed from gap-6 to gap-8 */}
-
-                  <div className="grid gap-4">  {/* Added a section wrapper with gap-8 */}
+              ) : step === 2 ? (
+                <div className="grid gap-8">
+                  <div className="grid gap-4">
                     <h3 className="font-semibold">Estilo e Preferências</h3>
-                    
-                    <div className="grid gap-4">  {/* Changed from gap-2 to gap-4 */}
+
+                    <div className="grid gap-4">
                       <div className="grid gap-2">
                         <Label>Estilo Preferido (escolha 2 que mais se identifica)</Label>
                         <div className="grid grid-cols-2 gap-4">
@@ -202,10 +248,12 @@ export function RegisterForm({
                                   type="checkbox"
                                   value={style}
                                   className="h-4 w-4"
-                                  {...register("dressingStyle")}
+                                  {...register("dressingStyle", {required: "Escolha ao menos um estilo"})}
                                   checked={selectedStyles.includes(style)}
                                   onChange={handleStyleChange}
-                                  disabled={selectedStyles.length >= 2 && !selectedStyles.includes(style)}
+                                  disabled={
+                                    selectedStyles.length >= 2 && !selectedStyles.includes(style)
+                                  }
                                 />
                               </div>
                               <span className="text-sm">{style}</span>
@@ -234,10 +282,12 @@ export function RegisterForm({
                                   type="checkbox"
                                   value={color}
                                   className="h-4 w-4"
-                                  {...register("preferredColors")}
+                                  {...register("preferredColors", {required: "Escolha ao menos uma cor"})}
                                   checked={selectedColors.includes(color)}
                                   onChange={handleColorChange}
-                                  disabled={selectedColors.length >= 3 && !selectedColors.includes(color)}
+                                  disabled={
+                                    selectedColors.length >= 3 && !selectedColors.includes(color)
+                                  }
                                 />
                               </div>
                               <span className="text-sm">{color}</span>
@@ -248,27 +298,29 @@ export function RegisterForm({
                     </div>
                   </div>
 
-                  <div className="grid gap-4">  {/* Added consistent section spacing */}
+                  <div className="grid gap-4">
                     <h3 className="font-semibold">Tamanho e Caimento</h3>
-                    
+
                     <div className="grid gap-2">
                       <Label>Tamanho de roupa</Label>
-                      <select 
+                      <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                        {...register("clothingSize")}
+                        {...register("clothingSize", {required: "Escolher preferencia de tamanho é obrigatório"})}
                       >
                         <option value="">Selecione seu tamanho</option>
                         {["PP", "P", "M", "G", "GG", "XG", "XGG", "3G", "4G"].map((size) => (
-                          <option key={size} value={size}>{size}</option>
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
                         ))}
                       </select>
                     </div>
 
                     <div className="grid gap-2">
                       <Label>Preferência de caimento</Label>
-                      <select 
+                      <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                        {...register("fitPreference")}
+                        {...register("fitPreference",{required: "Escolha um caimento é obrigatório"})}
                       >
                         <option value="">Selecione sua preferência</option>
                         <option value="Slim">Slim Fit</option>
@@ -281,23 +333,21 @@ export function RegisterForm({
 
                   <div className="grid gap-2">
                     <div className="flex gap-4 pt-4">
-                    <Button type="button"  variant="outline"  onClick={() => setStep(1)}>
+                      <Button type="button" variant="outline" onClick={() => setStep(1)}>
                         Voltar
                       </Button>
-                      <Button type="submit" className="flex-1" onClick={() => setStep(3)}>
+                      <Button type="submit" className="flex-1" onClick={handleSubmit(() => setStep(3), onSubmitError)}>
                         Próximo
                       </Button>
                     </div>
                   </div>
                 </div>
-              ): step === 3 ?
-              (
-                <div className="grid gap-8">  {/* Changed from gap-6 to gap-8 */}
+              ) : step === 3 ? (
+                <div className="grid gap-8">
+                  <div className="grid gap-4">
+                    <h3 className="font-semibold">Informações pessoais</h3>
 
-                  <div className="grid gap-4">  {/* Added a section wrapper with gap-8 */}
-                    
-                    <div className="grid gap-4">  {/* Changed from gap-2 to gap-4 */}
-
+                    <div className="grid gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="age">Idade</Label>
                         <Input
@@ -307,18 +357,31 @@ export function RegisterForm({
                           {...register("age", { required: false })}
                         />
                       </div>
-                  
+
                       <div className="grid gap-2">
-                        <Label>A qual etinia se identifica</Label>
-                        <select 
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
-                        {...register("ethnicity")}
-                      >
-                        <option value="">Selecione sua etinia</option>
-                        {["Branca", "Parda", "Preta", "Amarela", "Indígena"].map((size) => (
-                          <option key={size} value={size}>{size}</option>
-                        ))}
-                      </select>
+                        <Label>A qual etnia se identifica</Label>
+                        <select
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                          {...register("ethnicity", { required: false })}
+                        >
+                          <option value="">Selecione sua etnia</option>
+                          {["Branca", "Parda", "Preta", "Amarela", "Indígena"].map((size) => (
+                            <option key={size} value={size}>
+                              {size}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="grid gap-2">
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="hasObesity" className="mr-2">Você se considera/é obeso(a)?</Label>
+                          <Input
+                            id="hasObesity"
+                            type="checkbox"
+                            {...register("hasObesity")}
+                            className="h-4 w-4"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -334,12 +397,11 @@ export function RegisterForm({
                     </div>
                   </div>
                 </div>
-              )
-              : null}
+              ) : null}
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
