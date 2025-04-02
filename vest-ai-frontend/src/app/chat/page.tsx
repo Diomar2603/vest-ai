@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { OutfitDrawer } from "@/components/outfit-drawer"
 // Add Users to the imports at the top
 import { 
   Send, 
@@ -12,18 +13,17 @@ import {
   X,
   Plus  // Add this import
 } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sidebar } from "@/components/sidebar"
 import { ClothingCard } from "@/components/ui/clothing-card"
 import {
-  Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet"
+import { Header } from "@/components/header"
 
 export default function ChatPage() {
   const router = useRouter()
@@ -96,56 +96,12 @@ export default function ChatPage() {
     toast.success("Outfit criado com sucesso!")
   }
 
-  // In the Sheet component, add this after SheetTitle:
-  <SheetContent side="right" className="w-full sm:w-[400px]">
-    <SheetHeader>
-      <SheetTitle>Criar Novo Outfit</SheetTitle>
-    </SheetHeader>
-    
-    <div className="flex flex-col gap-4">
-      <div className="py-4">
-        <Input
-          placeholder="Nome do outfit..."
-          value={outfitName}
-          onChange={(e) => setOutfitName(e.target.value)}
-        />
-      </div>
-      
-      <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-2 gap-4">
-          {outfitItems.map((item) => (
-            <div key={item.id} className="relative">
-              <Image
-                src={item.src}
-                alt={item.alt}
-                width={150}
-                height={150}
-                className="rounded-md"
-              />
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1"
-                onClick={() => handleRemoveFromOutfit(item.id)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+  // Add this handler function
+  const handleClearOutfit = () => {
+    setOutfitItems([])
+    setOutfitName("")
+  }
 
-    <SheetFooter>
-      <Button 
-        onClick={handleCreateOutfit}
-        disabled={outfitItems.length === 0}
-        className="w-full"
-      >
-        Criar Outfit
-      </Button>
-    </SheetFooter>
-  </SheetContent>
   return (
     <div className="flex h-screen bg-background">
       {/* Mobile Sidebar Toggle */}
@@ -170,28 +126,7 @@ export default function ChatPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4">
-          <div className="md:hidden">
-            {/* Placeholder for mobile sidebar toggle */}
-          </div>
-          
-          <div className="flex-1 md:flex-none md:pl-16"></div>
-          
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setIsOutfitDrawerOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Criar Outfit
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => router.push("/account")}>
-              Minha Conta
-            </Button>           
-          </div>
-        </header>
+        <Header onCreateOutfit={() => setIsOutfitDrawerOpen(true)} />
 
         {/* Upper Scrollable Area - Messages */}
         <div className="h-[calc(42vh-48px)] overflow-y-auto">
@@ -252,69 +187,17 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-      {/* Outfit Creation Drawer */}
-      <Sheet open={isOutfitDrawerOpen} onOpenChange={setIsOutfitDrawerOpen}>
-        <SheetContent side="right" className="w-full sm:w-[400px] flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Criar Novo Outfit</SheetTitle>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-y-auto py-4">
-            <div className="grid grid-cols-2 gap-4">
-              {outfitItems.map((item) => (
-                <div key={item.id} className="relative">
-                  <Image
-                    src={item.src}
-                    alt={item.alt}
-                    width={150}
-                    height={150}
-                    className="rounded-md"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1"
-                    onClick={() => handleRemoveFromOutfit(item.id)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-4">
-            <div className="px-4">
-              <Input
-                placeholder="Nome do outfit..."
-                value={outfitName}
-                onChange={(e) => setOutfitName(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            
-            <SheetFooter className="flex gap-2">
-              <Button 
-                onClick={handleCreateOutfit}
-                disabled={outfitItems.length === 0}
-                className="flex-1"
-              >
-                Criar Outfit
-              </Button>
-              <Button 
-                onClick={() => {
-                  setOutfitItems([])
-                  setOutfitName("")
-                }}
-                variant="outline"
-                disabled={outfitItems.length === 0}
-              >
-                Limpar
-              </Button>
-            </SheetFooter>
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Remove the inline Sheet implementation and keep only the OutfitDrawer component */}
+      <OutfitDrawer 
+        isOpen={isOutfitDrawerOpen}
+        onOpenChange={setIsOutfitDrawerOpen}
+        outfitItems={outfitItems}
+        outfitName={outfitName}
+        onOutfitNameChange={(e) => setOutfitName(e.target.value)}
+        onRemoveItem={handleRemoveFromOutfit}
+        onClearOutfit={handleClearOutfit}
+        onCreateOutfit={handleCreateOutfit}
+      />
     </div>
   )
 }

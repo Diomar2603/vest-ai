@@ -6,19 +6,55 @@ import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
 import { ClothingCard } from "@/components/ui/clothing-card"
+import { OutfitDrawer } from "@/components/outfit-drawer"
+import { toast } from "sonner"
 
 export default function WardrobePage() {
+  const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  
+  // Add these new states
+  const [outfitItems, setOutfitItems] = useState<Array<{ id: number; src: string; alt: string }>>([])
+  const [outfitName, setOutfitName] = useState("")
+
+  // Update handleAddToOutfit
+  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
+    const isDuplicate = outfitItems.some(existingItem => existingItem.id === item.id)
+    
+    if (isDuplicate) {
+      toast.error("Este item já faz parte do outfit atual.")
+      return
+    }
+
+    setOutfitItems(prev => [...prev, item])
+    setIsOutfitDrawerOpen(true)
+  }
+
+  // Add these new handlers
+  const handleRemoveFromOutfit = (itemId: number) => {
+    setOutfitItems(prev => prev.filter(item => item.id !== itemId))
+  }
+
+  const handleClearOutfit = () => {
+    setOutfitItems([])
+    setOutfitName("")
+  }
+
+  const handleCreateOutfit = () => {
+    if (!outfitName.trim()) {
+      toast.error("Por favor, dê um nome ao seu outfit")
+      return
+    }
+    
+    setOutfitItems([])
+    setOutfitName("")
+    setIsOutfitDrawerOpen(false)
+    toast.success("Outfit criado com sucesso!")
+  }
+
   // Add handlers for clothing card actions
   const handleRemoveFromWardrobe = (itemId: number) => {
     // TODO: Implement remove logic
     console.log('Remove item:', itemId)
-  }
-
-  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
-    // TODO: Implement outfit logic
-    console.log('Add to outfit:', item)
   }
   
   const sections = [
@@ -82,7 +118,7 @@ export default function WardrobePage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+      <Header onCreateOutfit={() => setIsOutfitDrawerOpen(true)} />
 
         {/* Wardrobe Content */}
         <div className="flex-1 overflow-auto p-6">
@@ -112,6 +148,16 @@ export default function WardrobePage() {
           </div>
         </div>
       </div>
+      <OutfitDrawer 
+        isOpen={isOutfitDrawerOpen}
+        onOpenChange={setIsOutfitDrawerOpen}
+        outfitItems={outfitItems}
+        outfitName={outfitName}
+        onOutfitNameChange={(e) => setOutfitName(e.target.value)}
+        onRemoveItem={handleRemoveFromOutfit}
+        onClearOutfit={handleClearOutfit}
+        onCreateOutfit={handleCreateOutfit}
+      />
     </div>
   )
 }
