@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Shirt, ShoppingBag, Plus, Trash2 } from "lucide-react"
+import { Shirt, ShoppingBag, Plus, Trash2, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Tooltip,
@@ -15,9 +15,11 @@ interface ClothingCardProps {
   id: number
   src: string
   alt: string
-  buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove'>
+  buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove' | 'link'>
   onAddToOutfit?: (item: { id: number; src: string; alt: string }) => void
   onRemoveFromWardrobe?: (id: number) => void
+  isWishlist?: boolean
+  onSearchImage?: () => void
 }
 
 export function ClothingCard({ 
@@ -26,7 +28,9 @@ export function ClothingCard({
   alt, 
   buttons = [], 
   onAddToOutfit,
-  onRemoveFromWardrobe 
+  onRemoveFromWardrobe,
+  isWishlist = false,
+  onSearchImage
 }: ClothingCardProps) {
   const buttonConfig = {
     wardrobe: {
@@ -55,10 +59,18 @@ export function ClothingCard({
     },
     remove: {
       icon: <Trash2 className="h-6 w-6" />,
-      tooltip: "Remover do guarda roupa",
+      tooltip: isWishlist ? "Remover da lista de desejos" : "Remover do guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
         onRemoveFromWardrobe?.(id)
+      }
+    },
+    link: {
+      icon: <Link className="h-6 w-6" />,
+      tooltip: "Buscar imagem similar no Google",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        onSearchImage?.()
       }
     }
   }

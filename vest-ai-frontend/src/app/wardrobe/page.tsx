@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X, Settings, Plus, Trash } from "lucide-react"
+import { Menu, X, Settings, Plus, Trash, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/header"
@@ -16,6 +16,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default function WardrobePage() {
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
@@ -165,7 +171,21 @@ export default function WardrobePage() {
             <div className="max-w-6xl mx-auto">
               <h1 className="text-3xl font-bold mb-8">Meu Guarda-Roupa</h1>
   
-              <div className="flex justify-end mb-6">
+              <div className="flex justify-end mb-6 gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Criar com IA
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Peça ajuda ao assistente para criar um novo outfit</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
                 <Sheet open={isSectionsDrawerOpen} onOpenChange={setIsSectionsDrawerOpen}>
                   <SheetTrigger asChild>
                     <Button variant="outline" size="sm">
