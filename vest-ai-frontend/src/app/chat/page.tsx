@@ -11,7 +11,8 @@ import {
   User, 
   Menu,
   X,
-  Plus  // Add this import
+  Plus,
+  Sparkles  // Add this import
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,6 +25,12 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet"
 import { Header } from "@/components/header"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default function ChatPage() {
   const router = useRouter()
@@ -164,6 +171,24 @@ export default function ChatPage() {
               <Button onClick={handleSendMessage}>
                 <Send className="h-4 w-4" />
               </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="secondary"
+                      onClick={() => {
+                        setMessage("Crie um outfit para mim")
+                        handleSendMessage()
+                      }}
+                    >
+                      <Sparkles className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Peça ao assistente para criar um outfit</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
