@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { Menu, X, Settings, Plus, Trash, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import { Sidebar } from "@/components/ui/sidebar"
+import { Header } from "@/components/ui/header"
 import { ClothingCard } from "@/components/ui/clothing-card"
-import { OutfitDrawer } from "@/components/outfit-drawer"
+import { OutfitDrawer } from "@/components/ui/outfit-drawer"
 import { toast } from "sonner"
 import {
   Sheet,
@@ -103,7 +103,6 @@ export default function WardrobePage() {
   }
 
   const handleRemoveFromWardrobe = (itemId: number) => {
-    // TODO: Implement remove logic
     console.log('Remove item:', itemId)
   }
 
@@ -142,7 +141,6 @@ export default function WardrobePage() {
   return (
       <div>
       <div className="flex h-screen bg-background">
-        {/* Mobile Sidebar Toggle */}
         <div className="md:hidden fixed top-4 left-4 z-50">
           <Button 
             variant="outline" 
@@ -153,8 +151,7 @@ export default function WardrobePage() {
             {isMobileSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
-  
-        {/* Sidebar Components */}
+
         <Sidebar isMobile={false} />
         <Sidebar 
           isMobile={true} 
@@ -162,11 +159,9 @@ export default function WardrobePage() {
           setIsMobileSidebarOpen={setIsMobileSidebarOpen} 
         />
   
-        {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <Header onCreateOutfit={() => setIsOutfitDrawerOpen(true)} />
   
-          {/* Wardrobe Content */}
           <div className="flex-1 overflow-auto p-6">
             <div className="max-w-6xl mx-auto">
               <h1 className="text-3xl font-bold mb-8">Meu Guarda-Roupa</h1>

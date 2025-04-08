@@ -6,20 +6,13 @@ import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Shield,
-  Bell,
   LogOut,
-  Upload,
-  X,
   Eye,
   EyeOff,
   Save,
   ArrowRight,
   Sparkles,
   Lock,
-  History,
-  CreditCardIcon,
-  CheckCircle2,
 } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -28,15 +21,13 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 
 export default function AccountPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Estado dos dados do usuário
+
   const [userData, setUserData] = useState({
     name: "Victor",
     email: "vic@example.com",
@@ -56,9 +47,8 @@ export default function AccountPage() {
   const [isUploading, setIsUploading] = useState(false)
 
   
-  // Salvar alterações do perfil
   const saveProfileChanges = () => {
-    // Atualizar dados do usuário com os valores do formulário
+
     setUserData((prev) => ({
       ...prev,
       name: (document.getElementById("name") as HTMLInputElement).value,
@@ -72,9 +62,7 @@ export default function AccountPage() {
     })
   }
 
-  // Alterar senha
   const changePassword = () => {
-    // Validar senhas
     if (!passwords.current) {
       toast("Senha atual necessária",{
         description: "Por favor, insira sua senha atual",
@@ -96,7 +84,6 @@ export default function AccountPage() {
       return
     }
 
-    // Resetar campos de senha
     setPasswords({
       current: "",
       new: "",

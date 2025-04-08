@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Menu, X, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import { Sidebar } from "@/components/ui/sidebar"
+import { Header } from "@/components/ui/header"
 import {
   Tooltip,
   TooltipContent,
@@ -60,7 +60,6 @@ export default function OutfitsPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <Button 
           variant="outline" 
@@ -72,7 +71,6 @@ export default function OutfitsPage() {
         </Button>
       </div>
 
-      {/* Sidebar Components */}
       <Sidebar isMobile={false} />
       <Sidebar 
         isMobile={true} 
@@ -80,11 +78,8 @@ export default function OutfitsPage() {
         setIsMobileSidebarOpen={setIsMobileSidebarOpen} 
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-
-        {/* Outfits Content */}
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold mb-8">Meus Outfits</h1>

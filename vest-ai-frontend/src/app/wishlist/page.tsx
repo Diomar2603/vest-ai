@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { Menu, X, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import { Sidebar } from "@/components/ui/sidebar"
+import { Header } from "@/components/ui/header"
 import { ClothingCard } from "@/components/ui/clothing-card"
 
 export default function WishlistPage() {
@@ -17,7 +17,7 @@ export default function WishlistPage() {
   ])
 
   const handleRemoveFromWishlist = (itemId: number) => {
-    // TODO: Implement remove logic
+
     console.log('Remove item:', itemId)
   }
 
@@ -29,7 +29,6 @@ export default function WishlistPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <Button 
           variant="outline" 
@@ -41,7 +40,6 @@ export default function WishlistPage() {
         </Button>
       </div>
 
-      {/* Sidebar Components */}
       <Sidebar isMobile={false} />
       <Sidebar 
         isMobile={true} 
@@ -49,11 +47,9 @@ export default function WishlistPage() {
         setIsMobileSidebarOpen={setIsMobileSidebarOpen} 
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
-        {/* Wishlist Content */}
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold mb-8">Lista de Desejos</h1>

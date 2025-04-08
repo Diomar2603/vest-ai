@@ -1,30 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { OutfitDrawer } from "@/components/outfit-drawer"
-// Add Users to the imports at the top
+import { OutfitDrawer } from "@/components/ui/outfit-drawer"
 import { 
   Send, 
-  User, 
   Menu,
   X,
-  Plus,
-  Sparkles  // Add this import
+  Sparkles
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Sidebar } from "@/components/sidebar"
+import { Sidebar } from "@/components/ui/sidebar"
 import { ClothingCard } from "@/components/ui/clothing-card"
-import {
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet"
-import { Header } from "@/components/header"
+import { Header } from "@/components/ui/header"
 import {
   Tooltip,
   TooltipContent,
@@ -33,15 +23,13 @@ import {
 } from "@/components/ui/tooltip"
 
 export default function ChatPage() {
-  const router = useRouter()
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<{text: string, sender: "user" | "ai"}[]>([
     { text: "Olá! Sou sua assistente de moda pessoal. Como posso ajudar você hoje?", sender: "ai" }
   ])
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
-  // Mock data for the image grid
+  // mock
   const [outfitSuggestions, setOutfitSuggestions] = useState([
     { id: 1, src: "/images/black-tshirt.jpg?height=300&width=300", alt: "Outfit 1" },
     { id: 2, src: "/images/blue-jeans-pants.jpg?height=300&width=300", alt: "Outfit 2" },
@@ -53,13 +41,11 @@ export default function ChatPage() {
   const handleSendMessage = () => {
     if (!message.trim()) return
     
-    // Add user message
     setMessages(prev => [...prev, { text: message, sender: "user" }])
     
-    // Clear input
     setMessage("")
     
-    // Simulate AI response (in a real app, this would be an API call)
+    // mock
     setTimeout(() => {
       setMessages(prev => [...prev, { 
         text: "Aqui estão algumas sugestões de looks baseadas no seu estilo!", 
@@ -87,7 +73,6 @@ export default function ChatPage() {
     setOutfitItems(prev => prev.filter(item => item.id !== itemId))
   }
 
-  // Add this state for outfit name
   const [outfitName, setOutfitName] = useState("")
 
   const handleCreateOutfit = () => {
@@ -96,14 +81,12 @@ export default function ChatPage() {
       return
     }
     
-    // Add logic to save the outfit with its name
     setOutfitItems([])
     setOutfitName("")
     setIsOutfitDrawerOpen(false)
     toast.success("Outfit criado com sucesso!")
   }
 
-  // Add this handler function
   const handleClearOutfit = () => {
     setOutfitItems([])
     setOutfitName("")
@@ -111,7 +94,6 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Mobile Sidebar Toggle */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <Button 
           variant="outline" 
@@ -123,7 +105,6 @@ export default function ChatPage() {
         </Button>
       </div>
 
-      {/* Sidebar Components */}
       <Sidebar isMobile={false} />
       <Sidebar 
         isMobile={true} 
@@ -131,11 +112,10 @@ export default function ChatPage() {
         setIsMobileSidebarOpen={setIsMobileSidebarOpen} 
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Header onCreateOutfit={() => setIsOutfitDrawerOpen(true)} />
 
-        {/* Upper Scrollable Area - Messages */}
+        {/* Messages */}
         <div className="h-[calc(42vh-48px)] overflow-y-auto">
           <div className="max-w-3xl mx-auto flex flex-col gap-4 p-4">
             {messages.map((msg, index) => (
@@ -157,7 +137,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Fixed Input Bar */}
+        {/* Input */}
         <div className="h-20 border-y bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="max-w-3xl mx-auto py-4 px-4">
             <div className="flex gap-2">
@@ -193,7 +173,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Lower Scrollable Area - Suggestions */}
+        {/* Results */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto p-4">
             <h3 className="text-lg font-medium mb-4">Sugestões de Looks</h3>
@@ -212,7 +192,6 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-      {/* Remove the inline Sheet implementation and keep only the OutfitDrawer component */}
       <OutfitDrawer 
         isOpen={isOutfitDrawerOpen}
         onOpenChange={setIsOutfitDrawerOpen}

@@ -30,7 +30,6 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* Seção Hero */}
         <section className="relative px-4 py-20 md:py-28 flex items-center justify-center">
           <div className="container flex flex-col items-center text-center">
             <Badge className="mb-4" variant="outline">
@@ -64,7 +63,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seção de Recursos */}
         <section id="features" className="py-20 px-4 bg-muted/50 flex items-center justify-center">
           <div className="container">
             <div className="text-center mb-16">
@@ -120,7 +118,6 @@ export default function Home() {
           </div>
         </section>
 
-       {/* Seção Como Funciona */}
         <section id="how-it-works" className="py-20 flex items-center justify-center px-4">
           <div className="container">
             <div className="text-center mb-16">
@@ -232,7 +229,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Seção Chamada para Ação (CTA) */}
         <section className="py-20 bg-primary text-primary-foreground flex items-center justify-center px-4">
           <div className="container text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Pronto para Transformar Seu Estilo?</h2>
@@ -250,7 +246,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Rodapé */}
       <footer className="border-t py-12 bg-muted/30 flex items-center justify-center px-4">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

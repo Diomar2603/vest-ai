@@ -1,5 +1,5 @@
 
-import { RegisterForm } from "@/components/register-form"
+import { RegisterForm } from "@/components/ui/register-form"
 import { Sparkles } from "lucide-react"
 import Link from "next/link"
 
