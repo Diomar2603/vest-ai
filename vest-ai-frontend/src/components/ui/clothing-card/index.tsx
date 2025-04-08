@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Shirt, ShoppingBag, Plus, Trash2 } from "lucide-react"
+import { Shirt, ShoppingBag, Plus, Trash2, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Tooltip,
@@ -15,14 +15,27 @@ interface ClothingCardProps {
   id: number
   src: string
   alt: string
-  buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove'>
+  buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove' | 'link'>
+  onAddToOutfit?: (item: { id: number; src: string; alt: string }) => void
+  onRemoveFromWardrobe?: (id: number) => void
+  isWishlist?: boolean
+  onSearchImage?: () => void
 }
 
-export function ClothingCard({ id, src, alt, buttons = ['wardrobe', 'wishlist', 'outfit'] }: ClothingCardProps) {
+export function ClothingCard({ 
+  id, 
+  src, 
+  alt, 
+  buttons = [], 
+  onAddToOutfit,
+  onRemoveFromWardrobe,
+  isWishlist = false,
+  onSearchImage
+}: ClothingCardProps) {
   const buttonConfig = {
     wardrobe: {
       icon: <Shirt className="h-6 w-6" />,
-      tooltip: "Adicionar ao meu guarda roupa",
+      tooltip: "Adicionar ao guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
         // Add wardrobe action here
@@ -38,18 +51,26 @@ export function ClothingCard({ id, src, alt, buttons = ['wardrobe', 'wishlist', 
     },
     outfit: {
       icon: <Plus className="h-6 w-6" />,
-      tooltip: "Criar novo Outfit",
+      tooltip: "Adicionar ao outfit",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add create outfit action here
+        onAddToOutfit?.({ id, src, alt })
       }
     },
     remove: {
       icon: <Trash2 className="h-6 w-6" />,
-      tooltip: "Remover do meu guarda roupa",
+      tooltip: isWishlist ? "Remover da lista de desejos" : "Remover do guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add remove from wardrobe action here
+        onRemoveFromWardrobe?.(id)
+      }
+    },
+    link: {
+      icon: <Link className="h-6 w-6" />,
+      tooltip: "Buscar imagem similar no Google",
+      onClick: (e: React.MouseEvent) => {
+        e.stopPropagation()
+        onSearchImage?.()
       }
     }
   }
