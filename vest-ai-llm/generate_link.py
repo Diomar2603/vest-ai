@@ -6,13 +6,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from urllib.parse import quote_plus
+from urllib.parse import quote
 import requests
 import time
 from PIL import Image
 from io import BytesIO
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key='')
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key='AIzaSyAptRrc4rzi5JCZpuMsOhorW8NFSFIQGpg')
 
 class SearcherClothes() :
     def __init__(self,params):
@@ -25,6 +25,7 @@ class SearcherClothes() :
         self.has_obesity = params.get('hasObesity', False)
         self.ethnicity = params.get('ethnicity','Sem etnia especifica')
         self.age = params.get('age','Sem idade especifica')
+        self.gender = params.get('gender','Sem genero especifico')
 
 
         if self.has_obesity:
@@ -57,63 +58,77 @@ class SearcherClothes() :
     def identify_clothes(self) -> str:
         
         # Gera a query de busca usando o LLM
-        code,search_query = self.generate_search_query()
+        response_query = self.generate_search_query()
+        code = response_query['statusCode']
+        search_query = response_query['body']
+
         print("Iniciou")
         if code != 200:
-            return code,search_query
+            return response_query
         
         print(f"[DEBUG] Consulta gerada para o Pinterest: {search_query}")
 
         
-        code,images = self.get_pinterest_images(search_query)
+        response_images = self.get_pinterest_images(search_query)
+        code = response_images['statusCode']
+        images = response_images['body']
         if code != 200:
-            return code,images
+            return response_images
 
         print(f"Imagens {images}")
         
         if not images or images[0] == "Nenhuma imagem encontrada":
-            return 404,{'error':"images not found"}
+            return response_images
         
-        return 200,{'body':",".join(images)}
+        return {'body':",".join(images),"statusCode":200}
 
     def generate_search_query(self):
                 
         """Gera a query de busca usando o LLM"""
         prompt_template = PromptTemplate(
             input_variables=["style", "size", "fit_preference", "color", "ethnicity", "has_obesity","age"],
-            template="""
-                    Você é um assistente de moda que ajuda pessoas a encontrar imagens de roupas solicitadas no site pinterest, 
-                    Com base nas preferências do usuario passadas abaixo:
-                    É importante que o usuario se indentifique com quem veste a  roupa apresentada, então leve em consideração etnia, tamanho, etc 
+            template = """
+                        Você é um assistente de moda especializado em gerar pesquisas otimizadas para encontrar imagens de roupas no Pinterest.
 
-                    Encontre roupas no estilo {style} com pessoas de etnia {ethnicity} usando essas roupas e {has_obesity}, com idade por volta de {age} anos.
-                    Que tenha tamanho {size} com ajuste {fit_pref} podendo ter as cores {color}
-                    
-                    De forma detalhada e respeitando todas as epecificidades acima
-                    Retorne somente a sua melhor busca a ser feita, sem justificativas explicações. .
-                    """
+                        Com base nas preferências detalhadas abaixo, gere uma **única frase de busca**, altamente específica, para ser usada diretamente no campo de pesquisa do Pinterest. 
+
+                        ⚠️ É fundamental que o usuário se identifique com as pessoas que aparecem nas imagens — considere com atenção **etnia**, **gênero**, **tipo de corpo** (como sobrepeso), **idade**, e **preferência de caimento**. A busca deve refletir **quem está vestindo** as roupas, não apenas o estilo em si.
+
+                        ### Parâmetros do usuário:
+                        - Estilo desejado: {style}
+                        - Etnia: {ethnicity}
+                        - Gênero: {gender}
+                        - Sobrepeso/obesidade: {has_obesity}
+                        - Idade aproximada: {age} anos
+                        - Tamanho da roupa: {size}
+                        - Preferência de ajuste (fit): {fit_pref}
+                        - Cores preferidas: {color}
+
+                        🔍 Responda com **apenas a frase de busca ideal** (sem explicações ou pontuação extra), formatada como ela deveria ser digitada no campo de busca do Pinterest. Use **palavras-chave que otimizem os resultados** e **respeite todos os critérios acima com equilíbrio e naturalidade**.
+                        """
         )
         try:
             chain = LLMChain(llm=llm, prompt=prompt_template)
-            return 200,chain.run({
+            return {'body':chain.run({
                 "style": self.style,
                 "size": self.size,
                 "ethnicity": self.ethnicity,
+                "gender":self.gender,
                 "has_obesity": self.text_obesity,
                 "color":self.color,
                 "age": self.age,
                 "fit_pref": self.fit_pref
-            }).strip()
+            }).strip(),'statusCode':200}
         except Exception as e:
             print(f"Exception {str(e)}")
-            return 503,{"error":'To try connect with Gemini'}
+            return {"error":'To try connect with Gemini',"statusCode":503}
 
     def get_pinterest_images(self, query, max_images=5):
         
         driver = webdriver.Chrome(options=self.chrome_options)
         
         try:
-            url = f"https://www.pinterest.com/search/pins/?q={quote_plus(query)}"
+            url = f"https://br.pinterest.com/search/pins/?q={quote(query)}&rs=typed"
             print(f"[DEBUG] Acessando URL: {url}")
             driver.get(url)
             
@@ -145,13 +160,13 @@ class SearcherClothes() :
                             break
             
             if images:
-                return 200, images
+                return {"body":images,"statusCode":200}
             else:
-                return 404, {"error": "Images not found"}
+                return  {"error": "Images not found","statusCode":404}
         
         except Exception as e:
             print(f"[ERRO] Durante o scraping: {str(e)}")
-            return 503,{'error',"Error to try connect with pinterest"}
+            return {'error':"Error to try connect with pinterest","statusCode":503}
         
         finally:
             driver.quit()
@@ -166,44 +181,45 @@ class SearcherClothes() :
         
 
 
-# Exemplo de uso
-if __name__ == "__main__":
+# # Exemplo de uso
+# if __name__ == "__main__":
     
 
-    params = {
-        "fullName": "Leandro D G Silva",
-        "email": "leandrodiomar123@gmail.com",
-        "password": "12345678",
-        "confirmPassword": "12345678",
-        "phoneNumber": "",
-        "dressingStyle": [
-            "Esportivo",
-            "Vintage"
-        ],
-        "preferredColors": [
-            "Preto",
-            "Branco",
-            "Marrom"
-        ],
-        "clothingSize": "GG",
-        "fitPreference": "Oversized",
-        "age": "19",
-        "ethnicity": "Preta",
-        "hasObesity": False,
-        "hobbies": [
-            "Leitura",
-            "Exercícios físicos",
-            "Desenho",
-            "Caminhadas",
-            "Videogames"
-        ],
-        "salaryRange": "4"
-        }
-    searcher = SearcherClothes(params=params)
-    r = searcher.identify_clothes()
+#     params = {
+#         "fullName": "Leandro D G Silva",
+#         "email": "leandrodiomar123@gmail.com",
+#         "password": "12345678",
+#         "confirmPassword": "12345678",
+#         "phoneNumber": "",
+#         "dressingStyle": [
+#             "Esportivo",
+#             "Vintage"
+#         ],
+#         "preferredColors": [
+#             "Preto",
+#             "Branco",
+#             "Marrom"
+#         ],
+#         "gender":"Masculino",
+#         "clothingSize": "GG",
+#         "fitPreference": "Oversized",
+#         "age": "19",
+#         "ethnicity": "Preta",
+#         "hasObesity": False,
+#         "hobbies": [
+#             "Leitura",
+#             "Exercícios físicos",
+#             "Desenho",
+#             "Caminhadas",
+#             "Videogames"
+#         ],
+#         "salaryRange": "4"
+#         }
+#     searcher = SearcherClothes(params=params)
+#     r = searcher.identify_clothes()
 
-    print("\nResultados encontrados:")
-    print(r)
+#     print("\nResultados encontrados:")
+#     print(r)
 
-    # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
-    # searcher.dowloads_imgs(link=url)
+#     # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
+#     # searcher.dowloads_imgs(link=url)
