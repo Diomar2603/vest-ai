@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import Image from "next/image"
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
+import { useLogin } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 type FormValues = {
   email: string
@@ -18,16 +20,28 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="mt-2 w-[100%] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+  const loginMutation = useLogin();
+  
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    loginMutation.mutate(data, {
+      onSuccess: (response) => {
+        // Store in both localStorage and cookies
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        document.cookie = `token=${response.token}; path=/`;
+        
+        toast.success("Login realizado com sucesso!", {
+          onAutoClose: () => {
+            router.push('/chat');
+          },
+        });
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || "Erro ao fazer login");
+      },
+    });
   };
 
   return (

@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { SubmitHandler, useForm, FieldErrors } from "react-hook-form";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useRegister } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 // Update FormValues type
 type FormValues = {
@@ -64,6 +66,8 @@ export function RegisterForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
+  const registerMutation = useRegister();
   const [step, setStep] = useState(1);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
@@ -106,14 +110,23 @@ export function RegisterForm({
     }
   };
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="mt-2 w-[100%] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    registerMutation.mutate(
+      {
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Cadastro realizado com sucesso!");
+          router.push('/login');
+        },
+        onError: (error: Error) => {
+          toast.error(error.message || "Erro ao realizar cadastro");
+        },
+      }
+    );
   };
 
   const onSubmitError = (errors: FieldErrors<FormValues>) => {
