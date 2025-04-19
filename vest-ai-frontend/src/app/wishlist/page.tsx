@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { Menu, X, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/ui/sidebar"
-import { Header } from "@/components/ui/header"
 import { ClothingCard } from "@/components/ui/clothing-card"
+import { Header } from "@/components/ui/header"
+import { Sidebar } from "@/components/ui/sidebar"
+import { Menu, X } from "lucide-react"
+import { useState } from "react"
 
 export default function WishlistPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
