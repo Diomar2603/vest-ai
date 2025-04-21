@@ -8,10 +8,25 @@ interface LoginCredentials {
 }
 
 interface RegisterData {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
+  gender: string;
+  phoneNumber?: string;
+
+  dressingStyle: string[];
+  preferredColors: string[];
+  clothingSize: string;
+  fitPreference: string;
+
+  age: number;
+  ethnicity: string;
+  hasObesity: boolean;
+  salaryRange: number;
+  hobbies: string[];
 }
+
+
 
 export function useLogin() {
   return useMutation({
@@ -42,6 +57,7 @@ export function useRegister() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
       

@@ -23,38 +23,15 @@ type FormValues = {
   email: string;
   password: string;
   confirmPassword: string;
-  // Optional but recommended
+  gender : string;
   phoneNumber?: string;
-  // New style preference fields
+
   dressingStyle: string[];
   preferredColors: string[];
-  stylePreferences: string[];
-  priceRange: string;
-  preferredPatterns: string[];
-  followsTrends: string;
-  
-  // Clothes and Fabrics
-  commonClothingTypes: string[];
-  preferredFabrics: string[];
-  avoidedFabrics: string[];
-  
-  // Fit and Size
   clothingSize: string;
   fitPreference: string;
-  bodyType: string;
-  
-  // Occasions
-  occasionNeeds: string[];
-  formalStyle: string;
-  casualStyle: string[];
-  
-  // Accessories
-  commonAccessories: string[];
-  commonShoeTypes: string[];
   
   // Additional Preferences
-  sustainabilityPreference: string;
-  skinTonePalette: string;
   age: number;
   ethnicity: string;
   hasObesity: boolean;
@@ -111,12 +88,24 @@ export function RegisterForm({
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    registerMutation.mutate(
-      {
-        name: data.fullName,
+    registerMutation.mutate({
+        fullName: data.fullName,
         email: data.email,
         password: data.password,
-      },
+        gender: data.gender,
+        phoneNumber: data.phoneNumber,
+      
+        dressingStyle: data.dressingStyle,
+        preferredColors: data.preferredColors,
+        clothingSize: data.clothingSize,
+        fitPreference: data.fitPreference,
+      
+        age: data.age,
+        ethnicity: data.ethnicity,
+        hasObesity: data.hasObesity,
+        salaryRange: data.salaryRange,
+        hobbies: data.hobbies,
+      },    
       {
         onSuccess: () => {
           toast.success("Cadastro realizado com sucesso!");
@@ -232,6 +221,20 @@ export function RegisterForm({
                       </CardDescription>
                     )}
                   </div>
+                  <div className="grid gap-2">
+                      <Label>Genero</Label>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        {...register("gender", {required: "Selecionar opção é obrigatório"})}
+                      >
+                        <option value="">Selecione o Genero ao qual se identifica</option>
+                        {["Masculino","Feminino", "Não-binario", "Outro", "Prefiro não responder"].map((size) => (
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   <div className="grid gap-2">
                     <Label htmlFor="phoneNumber">Telefone (opcional)</Label>
                     <Input

@@ -14,4 +14,4 @@ const WishlistItemSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-export default mongoose.model<IWishlistItem>("WishlistItem", WishlistItemSchema);
+export default mongoose.model<IWishlistItem>("WishlistItem", WishlistItemSchema, "WishlistItem");

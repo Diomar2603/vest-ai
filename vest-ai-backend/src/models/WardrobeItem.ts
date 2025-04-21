@@ -16,4 +16,4 @@ const WardrobeItemSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-export default mongoose.model<IWardrobeItem>("WardrobeItem", WardrobeItemSchema);
+export default mongoose.model<IWardrobeItem>("WardrobeItem", WardrobeItemSchema, "WardrobeItem");

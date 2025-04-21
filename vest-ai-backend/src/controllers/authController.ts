@@ -2,10 +2,31 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
+import UserInformations, { IUserInformations } from "../models/UserInformations";
 
 export const register = async (req: Request, res: Response) : Promise<any> => {
   try {
-    const { name, email, password } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      gender,
+      phoneNumber,
+    
+      dressingStyle,
+      preferredColors,
+      clothingSize,
+      fitPreference,
+    
+      age,
+      ethnicity,
+      hasObesity,
+      salaryRange,
+      hobbies,
+    } = req.body;
+    
+
+    
 
     // Verifica se o usuário já existe
     const userExists = await User.findOne({ email });
@@ -18,12 +39,32 @@ export const register = async (req: Request, res: Response) : Promise<any> => {
 
     // Criação do usuário
     const newUser: IUser = new User({
-      name,
+      name: fullName,
       email,
       password: hashedPassword,
     });
 
+    const newUserInformations: IUserInformations = new UserInformations({
+      UserId: newUser._id,
+      dressingStyle : dressingStyle,
+      preferredColors: preferredColors,
+      clothingSize: clothingSize,
+      fitPreference : fitPreference,
+      
+      phoneNumber: phoneNumber,
+      gender: gender,
+      age: age,
+      ethnicity: ethnicity,
+      hasObesity: hasObesity,
+      salaryRange: salaryRange,
+      hobbies: hobbies,
+    });
+    
+
+
     await newUser.save();
+    await newUserInformations.save();
+
     res.status(201).json({ message: "Usuário registrado com sucesso!" });
   } catch (error) {
     res.status(500).json({ message: "Erro ao registrar usuário", error });

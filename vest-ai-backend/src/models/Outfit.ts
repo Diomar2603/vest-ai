@@ -22,4 +22,4 @@ const OutfitSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-export default mongoose.model<IOutfit>("Outfit", OutfitSchema);
+export default mongoose.model<IOutfit>("Outfit", OutfitSchema, "Outfit");
