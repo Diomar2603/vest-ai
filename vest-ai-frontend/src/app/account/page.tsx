@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -22,19 +22,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { useGetUserCredentials, useUpdateCredentials , useUpdatePassword} from "@/hooks/useUser"
 
 export default function AccountPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const { data, isLoading, error } = useGetUserCredentials();
+  const updateCredentialsMutation = useUpdateCredentials();
+  const updatePassword = useUpdatePassword();
 
   const [userData, setUserData] = useState({
-    name: "Victor",
-    email: "vic@example.com",
-    phone: "11 9123-4567",
+    name: "",
+    email: "",
+    phone: "",
     avatar: "/placeholder.svg?height=100&width=100",
-    joinDate: "01/04/2025",
-  })
+    joinDate: "",
+  });
+  
+  useEffect(() => {
+    if (data) {
+      setUserData({
+        name: data.fullName,
+        email: data.email,
+        phone: data.phoneNumber,
+        avatar: "/placeholder.svg?height=100&width=100", 
+        joinDate: data.joinDate,
+      });
+    }
+  
+    if (error) {
+      toast.error(error.message || "Erro ao buscar dados");
+    }
+  }, [data, error]);
+  
 
   // Estado das senhas
   const [passwords, setPasswords] = useState({
@@ -57,6 +78,20 @@ export default function AccountPage() {
       avatar: prev.avatar,
     }))
 
+    updateCredentialsMutation.mutate({
+      fullName: (document.getElementById("name") as HTMLInputElement).value,
+      email: (document.getElementById("email") as HTMLInputElement).value,
+      phoneNumber: (document.getElementById("phone") as HTMLInputElement).value,
+    },    
+    {
+      onSuccess: () => {
+        toast.success("Credenciais atualizadas com sucesso!");
+        router.push('/account');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || "Erro ao atualizar credenciais");
+      },
+    });
     toast("Perfil atualizado", {
       description: "Seu perfil foi atualizado com sucesso",
     })
@@ -83,6 +118,20 @@ export default function AccountPage() {
       })
       return
     }
+
+    updatePassword.mutate({
+      oldPassword: (document.getElementById("current-password") as HTMLInputElement).value,
+      newPassword: (document.getElementById("new-password") as HTMLInputElement).value,
+    },    
+    {
+      onSuccess: () => {
+        toast.success("Credenciais atualizadas com sucesso!");
+        router.push('/account');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || "Erro ao atualizar credenciais");
+      },
+    });
 
     setPasswords({
       current: "",

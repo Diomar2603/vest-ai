@@ -6,6 +6,7 @@ import wardrobeRoutes from "./routes/wardrobeRoutes";
 import outfitRoutes from "./routes/outfitRoutes";
 import wishlistRoutes from "./routes/wishlistRoutes";
 import cors from 'cors';
+import userRoutes from "./routes/userRoutes";
 
 dotenv.config();
 connectDB();
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/wardrobe", wardrobeRoutes)
 app.use("/api/outfits", outfitRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => {
   console.log(`🔥 Servidor rodando em http://localhost:${PORT}`);

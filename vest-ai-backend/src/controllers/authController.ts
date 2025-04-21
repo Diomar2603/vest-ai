@@ -42,6 +42,7 @@ export const register = async (req: Request, res: Response) : Promise<any> => {
       name: fullName,
       email,
       password: hashedPassword,
+      phoneNumber: phoneNumber
     });
 
     const newUserInformations: IUserInformations = new UserInformations({
@@ -51,7 +52,6 @@ export const register = async (req: Request, res: Response) : Promise<any> => {
       clothingSize: clothingSize,
       fitPreference : fitPreference,
       
-      phoneNumber: phoneNumber,
       gender: gender,
       age: age,
       ethnicity: ethnicity,
