@@ -33,10 +33,11 @@ export default function ChatPage() {
   const [outfitSuggestions, setOutfitSuggestions] = useState<Array<{ id: number; src: string; alt: string }>>([])
   const sendMessage = useSendMessage()
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) return
+  const handleSendMessage = async (customMessage?: string) => {
+    const messageToSend = customMessage || message;
+    if (!messageToSend.trim()) return
     
-    setMessages(prev => [...prev, { text: message, sender: "user" }])
+    setMessages(prev => [...prev, { text: messageToSend, sender: "user" }])
     
     try {
       const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
@@ -46,7 +47,7 @@ export default function ChatPage() {
       }
 
       const response = await sendMessage.mutateAsync({
-        message,
+        message: messageToSend,
         userId: userInfo.id
       })
       
@@ -56,7 +57,6 @@ export default function ChatPage() {
         sender: "ai" 
       }])
 
-      // Update outfit suggestions with the API response
       if (response.body && Array.isArray(response.body)) {
         const newSuggestions = response.body.map((url: string, index: number) => ({
           id: index + 1,
@@ -104,6 +104,14 @@ export default function ChatPage() {
     setOutfitName("")
     setIsOutfitDrawerOpen(false)
     toast.success("Outfit criado com sucesso!")
+  }
+
+  const handleAskForOutfit = () => {
+    const prompt = "Crie um outfit para mim por favor";
+    console.log("message é " + message);
+    setMessage(prompt);
+    console.log("message é " + message);
+    handleSendMessage(prompt);
   }
 
   const handleClearOutfit = () => {
@@ -169,7 +177,7 @@ export default function ChatPage() {
                 disabled={sendMessage.isPending}
               />
               <Button 
-                onClick={handleSendMessage} 
+                onClick={() => handleSendMessage()}
                 disabled={sendMessage.isPending}
               >
                 {sendMessage.isPending ? (
@@ -183,12 +191,14 @@ export default function ChatPage() {
                   <TooltipTrigger asChild>
                     <Button 
                       variant="secondary"
-                      onClick={() => {
-                        setMessage("Crie um outfit para mim")
-                        handleSendMessage()
-                      }}
+                      disabled={sendMessage.isPending}
+                      onClick={handleAskForOutfit}
                     >
-                      <Sparkles className="h-4 w-4" />
+                      {sendMessage.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
