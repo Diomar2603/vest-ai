@@ -11,8 +11,13 @@ import requests
 import time
 from PIL import Image
 from io import BytesIO
+from dotenv import load_dotenv
+import os
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key='AIzaSyAptRrc4rzi5JCZpuMsOhorW8NFSFIQGpg')
+load_dotenv()
+api_key = os.getenv('gemini_key')
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key=api_key)
 
 class SearcherClothes() :
     def __init__(self,params):
@@ -26,6 +31,7 @@ class SearcherClothes() :
         self.ethnicity = params.get('ethnicity','Sem etnia especifica')
         self.age = params.get('age','Sem idade especifica')
         self.gender = params.get('gender','Sem genero especifico')
+        self.user_message = params.get('user_message',None)
 
 
         if self.has_obesity:
@@ -80,21 +86,20 @@ class SearcherClothes() :
         if not images or images[0] == "Nenhuma imagem encontrada":
             return response_images
         
-        return {'body':",".join(images),"statusCode":200}
+        return {'body':images,"statusCode":200}
 
     def generate_search_query(self):
                 
         """Gera a query de busca usando o LLM"""
-        prompt_template = PromptTemplate(
-            input_variables=["style", "size", "fit_preference", "color", "ethnicity", "has_obesity","age"],
-            template = """
+
+        template = """
                         Você é um assistente de moda especializado em gerar pesquisas otimizadas para encontrar imagens de roupas no Pinterest.
 
                         Com base nas preferências detalhadas abaixo, gere uma **única frase de busca**, altamente específica, para ser usada diretamente no campo de pesquisa do Pinterest. 
 
                         ⚠️ É fundamental que o usuário se identifique com as pessoas que aparecem nas imagens — considere com atenção **etnia**, **gênero**, **tipo de corpo** (como sobrepeso), **idade**, e **preferência de caimento**. A busca deve refletir **quem está vestindo** as roupas, não apenas o estilo em si.
 
-                        ### Parâmetros do usuário:
+                        ### Preferências do usuário:
                         - Estilo desejado: {style}
                         - Etnia: {ethnicity}
                         - Gênero: {gender}
@@ -104,8 +109,16 @@ class SearcherClothes() :
                         - Preferência de ajuste (fit): {fit_pref}
                         - Cores preferidas: {color}
 
-                        🔍 Responda com **apenas a frase de busca ideal** (sem explicações ou pontuação extra), formatada como ela deveria ser digitada no campo de busca do Pinterest. Use **palavras-chave que otimizem os resultados** e **respeite todos os critérios acima com equilíbrio e naturalidade**.
                         """
+
+        if self.user_message:
+                 template += f"""O usuário expressou o seguinte desejo específico: "{self.user_message}". Use este desejo como foco principal da busca, respeitando também todas as preferências acima."""
+        
+        template += """🔍 Responda com **apenas a frase de busca ideal** (sem explicações ou pontuação extra), formatada como ela deveria ser digitada no campo de busca do Pinterest. Use **palavras-chave que otimizem os resultados** e **respeite todos os critérios acima com equilíbrio e naturalidade**."""
+        prompt_template = PromptTemplate(
+            input_variables=["style", "size", "fit_preference", "color", "ethnicity", "has_obesity","age"],
+            template = template
+            
         )
         try:
             chain = LLMChain(llm=llm, prompt=prompt_template)
@@ -143,14 +156,18 @@ class SearcherClothes() :
                 time.sleep(1.5)  # Aumentei o tempo de espera
                 
                 # Verifica se já tem imagens suficientes
+
                 current_images = driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]")
                 if len(current_images) >= max_images:
                     break
+            
+          
             
             # Coleta as imagens
             images = []
             for img in driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]"):
                 src = img.get_attribute("src")
+                print(f"Tag da imagem {img.get_attribute("alt")}")
                 if src and "i.pinimg.com" in src:
                     
                     clean_src = src.split('?')[0]
@@ -179,47 +196,3 @@ class SearcherClothes() :
         image = Image.open(BytesIO(response.content))
         print(image.show())
         
-
-
-# # Exemplo de uso
-# if __name__ == "__main__":
-    
-
-#     params = {
-#         "fullName": "Leandro D G Silva",
-#         "email": "leandrodiomar123@gmail.com",
-#         "password": "12345678",
-#         "confirmPassword": "12345678",
-#         "phoneNumber": "",
-#         "dressingStyle": [
-#             "Esportivo",
-#             "Vintage"
-#         ],
-#         "preferredColors": [
-#             "Preto",
-#             "Branco",
-#             "Marrom"
-#         ],
-#         "gender":"Masculino",
-#         "clothingSize": "GG",
-#         "fitPreference": "Oversized",
-#         "age": "19",
-#         "ethnicity": "Preta",
-#         "hasObesity": False,
-#         "hobbies": [
-#             "Leitura",
-#             "Exercícios físicos",
-#             "Desenho",
-#             "Caminhadas",
-#             "Videogames"
-#         ],
-#         "salaryRange": "4"
-#         }
-#     searcher = SearcherClothes(params=params)
-#     r = searcher.identify_clothes()
-
-#     print("\nResultados encontrados:")
-#     print(r)
-
-#     # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
-#     # searcher.dowloads_imgs(link=url)
