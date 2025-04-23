@@ -20,6 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useSendMessage } from "@/hooks/useChat"
+import { Loader2 } from "lucide-react" // Add this import
 
 export default function ChatPage() {
   const [message, setMessage] = useState("")
@@ -28,29 +30,47 @@ export default function ChatPage() {
   ])
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
-  // mock
-  const [outfitSuggestions, setOutfitSuggestions] = useState([
-    { id: 1, src: "/images/black-tshirt.jpg?height=300&width=300", alt: "Outfit 1" },
-    { id: 2, src: "/images/blue-jeans-pants.jpg?height=300&width=300", alt: "Outfit 2" },
-    { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 3" },
-    { id: 4, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 4" },
-    { id: 5, src: "/placeholder.svg?height=300&width=300", alt: "Outfit 5" },
-  ])
+  const [outfitSuggestions, setOutfitSuggestions] = useState<Array<{ id: number; src: string; alt: string }>>([])
+  const sendMessage = useSendMessage()
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!message.trim()) return
     
     setMessages(prev => [...prev, { text: message, sender: "user" }])
     
-    setMessage("")
-    
-    // mock
-    setTimeout(() => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
+      if (!userInfo.id) {
+        toast.error("Usuário não autenticado")
+        return
+      }
+
+      const response = await sendMessage.mutateAsync({
+        message,
+        userId: userInfo.id
+      })
+      
+      // Add AI response
       setMessages(prev => [...prev, { 
         text: "Aqui estão algumas sugestões de looks baseadas no seu estilo!", 
         sender: "ai" 
       }])
-    }, 1000)
+
+      // Update outfit suggestions with the API response
+      if (response.body && Array.isArray(response.body)) {
+        const newSuggestions = response.body.map((url: string, index: number) => ({
+          id: index + 1,
+          src: url,
+          alt: `Outfit Suggestion ${index + 1}`
+        }));
+        setOutfitSuggestions(newSuggestions);
+      }
+
+    } catch (error) {
+      toast.error("Erro ao processar mensagem")
+    } finally {
+      setMessage("")
+    }
   }
 
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
@@ -146,9 +166,17 @@ export default function ChatPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                 className="flex-1"
+                disabled={sendMessage.isPending}
               />
-              <Button onClick={handleSendMessage}>
-                <Send className="h-4 w-4" />
+              <Button 
+                onClick={handleSendMessage} 
+                disabled={sendMessage.isPending}
+              >
+                {sendMessage.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
               <TooltipProvider>
                 <Tooltip>
@@ -177,7 +205,7 @@ export default function ChatPage() {
           <div className="max-w-4xl mx-auto p-4">
             <h3 className="text-lg font-medium mb-4">Sugestões de Looks</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {outfitSuggestions.map((outfit) => (
+              {outfitSuggestions && Array.isArray(outfitSuggestions) && (outfitSuggestions as Array<{ id: number; src: string; alt: string }>).map((outfit) => (
                 <ClothingCard
                   key={outfit.id}
                   id={outfit.id}
