@@ -10,6 +10,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import "./styles.css"
+import { useState } from "react"
+import { WardrobeSectionSheet } from "@/components/ui/wardrobe-section-sheet"
 
 interface ClothingCardProps {
   id: number
@@ -18,6 +20,8 @@ interface ClothingCardProps {
   buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove' | 'link'>
   onAddToOutfit?: (item: { id: number; src: string; alt: string }) => void
   onRemoveFromWardrobe?: (id: number) => void
+  onAddToWardrobe?: (itemId: number, sectionId: string) => void
+  wardrobeSections?: Array<{ _id: string; name: string }>
   isWishlist?: boolean
   onSearchImage?: () => void
 }
@@ -29,16 +33,20 @@ export function ClothingCard({
   buttons = [], 
   onAddToOutfit,
   onRemoveFromWardrobe,
+  onAddToWardrobe,
+  wardrobeSections = [],
   isWishlist = false,
   onSearchImage
 }: ClothingCardProps) {
+  const [isWardrobeSheetOpen, setIsWardrobeSheetOpen] = useState(false)
+
   const buttonConfig = {
     wardrobe: {
       icon: <Shirt className="h-6 w-6" />,
       tooltip: "Adicionar ao guarda roupa",
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add wardrobe action here
+        setIsWardrobeSheetOpen(true)
       }
     },
     wishlist: {
@@ -76,7 +84,7 @@ export function ClothingCard({
   }
 
   return (
-    <div className="clothing-card cursor-pointer">
+    <div className="clothing-card">
       <Image
         src={src}
         alt={alt}
@@ -105,6 +113,17 @@ export function ClothingCard({
           ))}
         </TooltipProvider>
       </div>
+
+      <WardrobeSectionSheet
+        isOpen={isWardrobeSheetOpen}
+        onOpenChange={setIsWardrobeSheetOpen}
+        sections={wardrobeSections}
+        onSelectSection={(sectionId) => {
+          onAddToWardrobe?.(id, sectionId)
+          setIsWardrobeSheetOpen(false)
+        }}
+        itemId={id}
+      />
     </div>
   )
 }

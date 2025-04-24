@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
 import UserInformations, { IUserInformations } from "../models/UserInformations";
+import WardrobeSection from "../models/WardrobeSection";
 
 export const register = async (req: Request, res: Response) : Promise<any> => {
   try {
@@ -59,11 +60,17 @@ export const register = async (req: Request, res: Response) : Promise<any> => {
       salaryRange: salaryRange,
       hobbies: hobbies,
     });
-    
 
+    // Create default wardrobe sections
+    const defaultSections = ['Camisas', 'Calças', 'Calçados', 'Acessórios'];
+    const wardrobeSections = defaultSections.map(name => new WardrobeSection({
+      userId: newUser._id,
+      name
+    }));
 
     await newUser.save();
     await newUserInformations.save();
+    await Promise.all(wardrobeSections.map(section => section.save()));
 
     res.status(201).json({ message: "Usuário registrado com sucesso!" });
   } catch (error) {

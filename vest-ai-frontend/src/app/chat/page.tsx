@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { OutfitDrawer } from "@/components/ui/outfit-drawer"
 import { 
@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/tooltip"
 import { useSendMessage } from "@/hooks/useChat"
 import { Loader2 } from "lucide-react" // Add this import
+import { useWardrobeSections } from "@/hooks/useWardrobeSections";
+import { useAddToWardrobe } from "@/hooks/useAddToWardrobe"
 
 export default function ChatPage() {
   const [message, setMessage] = useState("")
@@ -117,6 +119,18 @@ export default function ChatPage() {
   const handleClearOutfit = () => {
     setOutfitItems([])
     setOutfitName("")
+  }
+
+  const { sections: wardrobeSections, isLoading: sectionsLoading } = useWardrobeSections();
+
+  const { addToWardrobe } = useAddToWardrobe()
+
+  const handleAddToWardrobe = async (itemId: number, sectionId: string) => {
+    await addToWardrobe({ 
+      itemId, 
+      sectionId, 
+      items: outfitSuggestions 
+    })
   }
 
   return (
@@ -223,6 +237,8 @@ export default function ChatPage() {
                   alt={outfit.alt}
                   buttons={["wardrobe", "wishlist", "outfit"]}
                   onAddToOutfit={handleAddToOutfit}
+                  onAddToWardrobe={handleAddToWardrobe}
+                  wardrobeSections={wardrobeSections}
                 />
               ))}
             </div>

@@ -10,7 +10,7 @@ export interface IWardrobeItem extends Document {
 
 const WardrobeItemSchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  section: { type: String, required: true },
+  section: { type: Schema.Types.ObjectId, ref: 'WardrobeSection', required: true },
   src: { type: String, required: true },
   alt: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }

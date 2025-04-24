@@ -1,8 +1,21 @@
 import express, { Request, Response } from "express";
 import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
 import WardrobeItem from "../models/WardrobeItem";
+import WardrobeSection from "../models/WardrobeSection";
 
 const router = express.Router();
+
+router.get("/sections", authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    console.log(req.user);
+    console.log(req.user?.id);
+
+    const sections = await WardrobeSection.find({ userId: req.user?.id });
+    res.json(sections);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching wardrobe sections" });
+  }
+});
 
 // Get all wardrobe items for the authenticated user
 router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
@@ -18,8 +31,11 @@ router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
 router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { section, src, alt } = req.body;
+
+    console.log({ section, src, alt });
+
     const item = new WardrobeItem({
-      userId: req.user?._id,
+      userId: req.user?.id,
       section,
       src,
       alt
