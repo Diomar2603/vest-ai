@@ -1,5 +1,5 @@
 "use client"
-
+import { useEffect } from "react"
 import { useState } from "react"
 import { Menu, X, Settings, Plus, Trash, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -36,7 +36,13 @@ export default function WardrobePage() {
   const { sections, isLoading: sectionsLoading } = useWardrobeSections()
   const { items, isLoading: itemsLoading } = useWardrobeItems()
 
-  const [tempSections, setTempSections] = useState(sections || [])
+  const [tempSections, setTempSections] = useState<Array<{ _id: string; name: string }>>([])
+
+  useEffect(() => {
+    if (isSectionsDrawerOpen && sections) {
+      setTempSections(sections)
+    }
+  }, [isSectionsDrawerOpen, sections])
 
   const handleAddToOutfit = (item: WardrobeItem) => {
     const isDuplicate = outfitItems.some(existingItem => existingItem._id === item._id)
@@ -81,7 +87,7 @@ export default function WardrobePage() {
       return
     }
     setTempSections(prev => prev.map(section => 
-      section._id === id ? { ...section, title: newTitle } : section
+      section._id === id ? { ...section, name: newTitle } : section
     ))
   }
 
