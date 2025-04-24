@@ -9,15 +9,23 @@ from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import quote
 import requests
 import time
-from PIL import Image
-from io import BytesIO
 from dotenv import load_dotenv
 import os
+from openai import OpenAI
+from io import BytesIO
 
 load_dotenv()
 api_key = os.getenv('gemini_key')
 
+
+
+#######Tirar idade - colocar classificação ?
+# Tirar tamanho 
+# Double check das imagens
+
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key=api_key)
+open_ai_key = os.getenv('openai_key')
+client_openai = OpenAI(api_key=open_ai_key)
 
 class SearcherClothes() :
     def __init__(self,params):
@@ -33,17 +41,25 @@ class SearcherClothes() :
         self.gender = params.get('gender','Sem genero especifico')
         self.user_message = params.get('user_message',None)
 
+        
 
         if self.has_obesity:
-            self.text_obesity = "que não tenha obesidade"
-        else:
             self.text_obesity = "que tenha obesidade"
-
+        else:
+            self.text_obesity = "que não tenha obesidade"
+            
         if type(self.color) == list:
             self.color = self.list_to_text(a=self.color)
 
         if type(self.style) == list:
             self.style = self.list_to_text(a=self.style)
+
+        if int(self.age) < 15:
+            self.age_classification = 'Criança'
+        elif int(self.age) < 60:
+            self.age_classification = 'Não considerar relevante'
+        else:
+            self.age_classification = 'Idoso'
 
         #Set para o selenium      
         self.chrome_options = Options()
@@ -51,7 +67,6 @@ class SearcherClothes() :
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--window-size=1920,1080")
         self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-
     
     """Transforma a lista em texto com os elementos separados por virgula"""
     def list_to_text(self, a:list) -> str:
@@ -75,18 +90,20 @@ class SearcherClothes() :
         print(f"[DEBUG] Consulta gerada para o Pinterest: {search_query}")
 
         
-        response_images = self.get_pinterest_images(search_query)
+        response_images = self.get_pinterest_images(search_query,max_images=5)
+
         code = response_images['statusCode']
-        images = response_images['body']
+        
         if code != 200:
             return response_images
-
+        images = response_images['body']
         print(f"Imagens {images}")
         
         if not images or images[0] == "Nenhuma imagem encontrada":
             return response_images
         
         return {'body':images,"statusCode":200}
+
 
     def generate_search_query(self):
                 
@@ -104,8 +121,7 @@ class SearcherClothes() :
                         - Etnia: {ethnicity}
                         - Gênero: {gender}
                         - Sobrepeso/obesidade: {has_obesity}
-                        - Idade aproximada: {age} anos
-                        - Tamanho da roupa: {size}
+                        - Grupo de idade: {age_classification}
                         - Preferência de ajuste (fit): {fit_pref}
                         - Cores preferidas: {color}
 
@@ -116,7 +132,7 @@ class SearcherClothes() :
         
         template += """🔍 Responda com **apenas a frase de busca ideal** (sem explicações ou pontuação extra), formatada como ela deveria ser digitada no campo de busca do Pinterest. Use **palavras-chave que otimizem os resultados** e **respeite todos os critérios acima com equilíbrio e naturalidade**."""
         prompt_template = PromptTemplate(
-            input_variables=["style", "size", "fit_preference", "color", "ethnicity", "has_obesity","age"],
+            input_variables=["style", "fit_preference", "color", "ethnicity", "has_obesity","age_classification"],
             template = template
             
         )
@@ -124,17 +140,17 @@ class SearcherClothes() :
             chain = LLMChain(llm=llm, prompt=prompt_template)
             return {'body':chain.run({
                 "style": self.style,
-                "size": self.size,
                 "ethnicity": self.ethnicity,
                 "gender":self.gender,
                 "has_obesity": self.text_obesity,
+                "age_classification":self.age_classification,
                 "color":self.color,
-                "age": self.age,
                 "fit_pref": self.fit_pref
             }).strip(),'statusCode':200}
         except Exception as e:
             print(f"Exception {str(e)}")
             return {"error":'To try connect with Gemini',"statusCode":503}
+
 
     def get_pinterest_images(self, query, max_images=5):
         
@@ -167,12 +183,14 @@ class SearcherClothes() :
             images = []
             for img in driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]"):
                 src = img.get_attribute("src")
-                print(f"Tag da imagem {img.get_attribute("alt")}")
                 if src and "i.pinimg.com" in src:
                     
                     clean_src = src.split('?')[0]
-                    if clean_src not in images:  
-                        images.append(clean_src)
+                    if clean_src not in images:
+                        
+                        match_img = self.analyze_img(query=query,link=clean_src)
+                        if match_img:  
+                            images.append(clean_src)
                         if len(images) >= max_images:
                             break
             
@@ -188,11 +206,31 @@ class SearcherClothes() :
         finally:
             driver.quit()
 
-    def dowloads_imgs(self,
-                      link):
+    "Analisa se a imagem está de acordo com a pesquisa"
+    def analyze_img(self,query,link):        
+
+       
+        response = client_openai.chat.completions.create(
+            model="gpt-4.1-mini", 
+            messages=[{
+            "role": "user",
+            "content": [
+                {"type": "text", "text": f"A imagem corresponde o que foi buscado que está abaixo ? responda Apenas com Sim ou Não \n {query}"},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"{link}",
+                    },
+                },
+            ],
+        }],
+    )
         
-        response = requests.get(link, stream=True)
-        response.raise_for_status()  # Lança uma exceção para erros HTTP
-        image = Image.open(BytesIO(response.content))
-        print(image.show())
+
         
+        result = response.choices[0].message.content.lower()
+        
+        if result == "sim" or result == "true":
+            return True
+        return False
+    
