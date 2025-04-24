@@ -14,7 +14,7 @@ interface WardrobeSectionSheetProps {
   onOpenChange: (open: boolean) => void
   sections: Array<{ _id: string; name: string }>
   onSelectSection: (sectionId: string) => void
-  itemId: number
+  itemId: string
 }
 
 export function WardrobeSectionSheet({

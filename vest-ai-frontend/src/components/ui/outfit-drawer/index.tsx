@@ -15,10 +15,10 @@ import {
 interface OutfitDrawerProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  outfitItems: Array<{ id: number; src: string; alt: string }>
+  outfitItems: Array<{ id: string; src: string; alt: string }>
   outfitName: string
   onOutfitNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onRemoveItem: (id: number) => void
+  onRemoveItem: (id: string) => void
   onClearOutfit: () => void
   onCreateOutfit: () => void
 }

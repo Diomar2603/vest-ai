@@ -14,13 +14,13 @@ import { useState } from "react"
 import { WardrobeSectionSheet } from "@/components/ui/wardrobe-section-sheet"
 
 interface ClothingCardProps {
-  id: number
+  id: string
   src: string
   alt: string
   buttons?: Array<'wardrobe' | 'wishlist' | 'outfit' | 'remove' | 'link'>
-  onAddToOutfit?: (item: { id: number; src: string; alt: string }) => void
-  onRemoveFromWardrobe?: (id: number) => void
-  onAddToWardrobe?: (itemId: number, sectionId: string) => void
+  onAddToOutfit?: (item: { id: string; src: string; alt: string }) => void
+  onRemoveFromWardrobe?: (id: string) => void
+  onAddToWardrobe?: (itemId: string, sectionId: string) => void
   wardrobeSections?: Array<{ _id: string; name: string }>
   isWishlist?: boolean
   onSearchImage?: () => void

@@ -32,7 +32,7 @@ export default function ChatPage() {
   ])
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   
-  const [outfitSuggestions, setOutfitSuggestions] = useState<Array<{ id: number; src: string; alt: string }>>([])
+  const [outfitSuggestions, setOutfitSuggestions] = useState<Array<{ id: string; src: string; alt: string }>>([])
   const sendMessage = useSendMessage()
 
   const handleSendMessage = async (customMessage?: string) => {
@@ -76,9 +76,9 @@ export default function ChatPage() {
   }
 
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
-  const [outfitItems, setOutfitItems] = useState<Array<{ id: number; src: string; alt: string }>>([])
+  const [outfitItems, setOutfitItems] = useState<Array<{ id: string; src: string; alt: string }>>([])
 
-  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
+  const handleAddToOutfit = (item: { id: string; src: string; alt: string }) => {
     const isDuplicate = outfitItems.some(existingItem => existingItem.id === item.id)
     
     if (isDuplicate) {
@@ -90,7 +90,7 @@ export default function ChatPage() {
     setIsOutfitDrawerOpen(true)
   }
 
-  const handleRemoveFromOutfit = (itemId: number) => {
+  const handleRemoveFromOutfit = (itemId: string) => {
     setOutfitItems(prev => prev.filter(item => item.id !== itemId))
   }
 
@@ -125,7 +125,7 @@ export default function ChatPage() {
 
   const { addToWardrobe } = useAddToWardrobe()
 
-  const handleAddToWardrobe = async (itemId: number, sectionId: string) => {
+  const handleAddToWardrobe = async (itemId: string, sectionId: string) => {
     await addToWardrobe({ 
       itemId, 
       sectionId, 
@@ -229,7 +229,7 @@ export default function ChatPage() {
           <div className="max-w-4xl mx-auto p-4">
             <h3 className="text-lg font-medium mb-4">Sugestões de Looks</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {outfitSuggestions && Array.isArray(outfitSuggestions) && (outfitSuggestions as Array<{ id: number; src: string; alt: string }>).map((outfit) => (
+              {outfitSuggestions && Array.isArray(outfitSuggestions) && (outfitSuggestions as Array<{ id: string; src: string; alt: string }>).map((outfit) => (
                 <ClothingCard
                   key={outfit.id}
                   id={outfit.id}

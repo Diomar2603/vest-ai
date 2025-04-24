@@ -20,7 +20,7 @@ router.get("/sections", authMiddleware, async (req: AuthRequest, res: Response) 
 // Get all wardrobe items for the authenticated user
 router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const items = await WardrobeItem.find({ userId: req.user?._id });
+    const items = await WardrobeItem.find({ userId: req.user?.id });
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: "Error fetching wardrobe items" });

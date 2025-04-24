@@ -22,55 +22,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useWardrobeSections } from "@/hooks/useWardrobeSections"
+import { useWardrobeItems, WardrobeItem } from "@/hooks/useWardrobeItems"
+import { useUpdateWardrobeSections } from "@/hooks/useUpdateWardrobeSections"
 
 export default function WardrobePage() {
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const [outfitItems, setOutfitItems] = useState<Array<{ id: number; src: string; alt: string }>>([])
+  const [outfitItems, setOutfitItems] = useState<Array<WardrobeItem>>([])
   const [outfitName, setOutfitName] = useState("")
   const [isSectionsDrawerOpen, setIsSectionsDrawerOpen] = useState(false)
   
-  const [sections, setSections] = useState([
-    {
-      id: 'shirts',
-      title: 'Camisas',
-      items: [
-        { id: 1, src: "/images/black-tshirt.jpg?height=300&width=300", alt: "Camisa 1" },
-        { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Camisa 2" },
-        { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Camisa 3" },
-      ]
-    },
-    {
-      id: 'pants',
-      title: 'Calças',
-      items: [
-        { id: 1, src: "/placeholder.svg?height=300&width=300", alt: "Calça 1" },
-        { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Calça 2" },
-      ]
-    },
-    {
-      id: 'shoes',
-      title: 'Sapatos',
-      items: [
-        { id: 1, src: "/placeholder.svg?height=300&width=300", alt: "Sapato 1" },
-        { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Sapato 2" },
-        { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Sapato 3" },
-      ]
-    },
-    {
-      id: 'accessories',
-      title: 'Acessórios',
-      items: [
-        { id: 1, src: "/placeholder.svg?height=300&width=300", alt: "Acessório 1" },
-        { id: 2, src: "/placeholder.svg?height=300&width=300", alt: "Acessório 2" },
-      ]
-    }
-  ])
+  const { sections, isLoading: sectionsLoading } = useWardrobeSections()
+  const { items, isLoading: itemsLoading } = useWardrobeItems()
 
-  const [tempSections, setTempSections] = useState(sections)
+  const [tempSections, setTempSections] = useState(sections || [])
 
-  const handleAddToOutfit = (item: { id: number; src: string; alt: string }) => {
-    const isDuplicate = outfitItems.some(existingItem => existingItem.id === item.id)
+  const handleAddToOutfit = (item: WardrobeItem) => {
+    const isDuplicate = outfitItems.some(existingItem => existingItem._id === item._id)
     
     if (isDuplicate) {
       toast.error("Este item já faz parte do outfit atual.")
@@ -81,8 +50,8 @@ export default function WardrobePage() {
     setIsOutfitDrawerOpen(true)
   }
 
-  const handleRemoveFromOutfit = (itemId: number) => {
-    setOutfitItems(prev => prev.filter(item => item.id !== itemId))
+  const handleRemoveFromOutfit = (itemId: string) => {
+    setOutfitItems(prev => prev.filter(item => item._id !== itemId))
   }
 
   const handleClearOutfit = () => {
@@ -102,7 +71,7 @@ export default function WardrobePage() {
     toast.success("Outfit criado com sucesso!")
   }
 
-  const handleRemoveFromWardrobe = (itemId: number) => {
+  const handleRemoveFromWardrobe = (itemId: string) => {
     console.log('Remove item:', itemId)
   }
 
@@ -112,14 +81,14 @@ export default function WardrobePage() {
       return
     }
     setTempSections(prev => prev.map(section => 
-      section.id === id ? { ...section, title: newTitle } : section
+      section._id === id ? { ...section, title: newTitle } : section
     ))
   }
 
   const handleAddSection = () => {
     setTempSections(prev => [...prev, {
-      id: `section-${Date.now()}`,
-      title: "Nova Seção",
+      _id: `section-${Date.now()}`,
+      name: "Nova Seção",
       items: []
     }])
   }
@@ -129,13 +98,23 @@ export default function WardrobePage() {
       toast.error("Você precisa manter pelo menos uma seção")
       return
     }
-    setTempSections(prev => prev.filter(section => section.id !== id))
+    setTempSections(prev => prev.filter(section => section._id !== id))
   }
 
-  const handleSaveSections = () => {
-    setSections(tempSections)
-    setIsSectionsDrawerOpen(false)
-    toast.success("Alterações salvas com sucesso!")
+  const updateSections = useUpdateWardrobeSections()
+
+  const handleSaveSections = async () => {
+    try {
+      await updateSections.mutateAsync(tempSections)
+      setIsSectionsDrawerOpen(false)
+      toast.success("Alterações salvas com sucesso!")
+    } catch (error) {
+      toast.error("Erro ao salvar alterações")
+    }
+  }
+
+  if (sectionsLoading || itemsLoading) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -195,16 +174,16 @@ export default function WardrobePage() {
                     <div className="flex flex-col h-full p-3">
                       <div className="flex-1 space-y-4 py-4">
                         {tempSections.map((section) => (
-                          <div key={section.id} className="flex items-center gap-2">
+                          <div key={section._id} className="flex items-center gap-2">
                             <Input 
-                              defaultValue={section.title}
-                              onBlur={(e) => handleUpdateSection(section.id, e.target.value)}
+                              defaultValue={section.name}
+                              onBlur={(e) => handleUpdateSection(section._id, e.target.value)}
                               className="w-[300px]"
                             />
                             <Button 
                               variant="destructive" 
                               size="icon"
-                              onClick={() => handleDeleteSection(section.id)}
+                              onClick={() => handleDeleteSection(section._id)}
                             >
                               <Trash className="h-4 w-4" />
                             </Button>
@@ -230,21 +209,21 @@ export default function WardrobePage() {
               </div>
   
               <div className="space-y-8">
-                {sections.map((section) => (
+                {sections?.map((section) => (
                   <section 
-                    key={section.id} 
+                    key={section._id} 
                     className="bg-muted/50 rounded-lg p-6 first:pt-6"
                   >
-                    <h2 className="text-2xl font-semibold mb-6">{section.title}</h2>
+                    <h2 className="text-2xl font-semibold mb-6">{section.name}</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {section.items.map((item) => (
+                      {items?.filter((item: WardrobeItem) => item.section === section._id).map((item: WardrobeItem) => (
                         <ClothingCard 
-                          key={item.id}
-                          id={item.id}
+                          key={item._id}
+                          id={item._id}
                           src={item.src}
                           alt={item.alt}
                           buttons={["remove", "outfit"]}
-                          onRemoveFromWardrobe={() => handleRemoveFromWardrobe(item.id)}
+                          onRemoveFromWardrobe={() => handleRemoveFromWardrobe(item._id)}
                           onAddToOutfit={() => handleAddToOutfit(item)}
                         />
                       ))}
@@ -259,12 +238,17 @@ export default function WardrobePage() {
       <OutfitDrawer 
           isOpen={isOutfitDrawerOpen}
           onOpenChange={setIsOutfitDrawerOpen}
-          outfitItems={outfitItems}
+          outfitItems={outfitItems.map(item => ({
+            id: item._id,
+            src: item.src,
+            alt: item.alt
+          }))}
           outfitName={outfitName}
           onOutfitNameChange={(e) => setOutfitName(e.target.value)}
-          onRemoveItem={handleRemoveFromOutfit}
+          onRemoveItem={(id) => handleRemoveFromOutfit(outfitItems.filter(t => t._id === id)[0]._id)}
           onClearOutfit={handleClearOutfit}
           onCreateOutfit={handleCreateOutfit}
         />
-    </div>)
-    }
+    </div>
+  )
+}

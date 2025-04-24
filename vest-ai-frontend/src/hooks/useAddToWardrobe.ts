@@ -1,9 +1,9 @@
 import { toast } from "sonner"
 
 interface AddToWardrobeParams {
-  itemId: number
+  itemId: string
   sectionId: string
-  items: Array<{ id: number; src: string; alt: string }>
+  items: Array<{ id: string; src: string; alt: string }>
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
