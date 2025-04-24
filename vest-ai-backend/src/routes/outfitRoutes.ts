@@ -4,33 +4,32 @@ import Outfit from "../models/Outfit";
 
 const router = express.Router();
 
-// Get all outfits for the authenticated user
 router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const outfits = await Outfit.find({ userId: req.user?._id });
+    const outfits = await Outfit.find({ userId: req.user?.id });
     res.json(outfits);
   } catch (error) {
     res.status(500).json({ message: "Error fetching outfits" });
   }
 });
 
-// Create a new outfit
 router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { name, items } = req.body;
+
     const outfit = new Outfit({
-      userId: req.user?._id,
+      userId: req.user?.id,
       name,
       items
     });
     await outfit.save();
     res.status(201).json(outfit);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating outfit" });
   }
 });
 
-// Delete an outfit
 router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const outfit = await Outfit.findOneAndDelete({

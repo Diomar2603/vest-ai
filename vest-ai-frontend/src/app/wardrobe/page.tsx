@@ -25,6 +25,7 @@ import {
 import { useWardrobeSections } from "@/hooks/useWardrobeSections"
 import { useWardrobeItems, WardrobeItem } from "@/hooks/useWardrobeItems"
 import { useUpdateWardrobeSections } from "@/hooks/useUpdateWardrobeSections"
+import { useOutfits } from "@/hooks/useOutfits"
 
 export default function WardrobePage() {
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
@@ -65,16 +66,32 @@ export default function WardrobePage() {
     setOutfitName("")
   }
 
-  const handleCreateOutfit = () => {
+  const { createOutfit } = useOutfits()
+
+  const handleCreateOutfit = async () => {
     if (!outfitName.trim()) {
       toast.error("Por favor, dê um nome ao seu outfit")
       return
     }
-    
-    setOutfitItems([])
-    setOutfitName("")
-    setIsOutfitDrawerOpen(false)
-    toast.success("Outfit criado com sucesso!")
+
+    try {
+      await createOutfit.mutateAsync({
+        name: outfitName,
+        items: outfitItems.map(item => ({
+          id: item._id,
+          section: item.section,
+          src: item.src,
+          alt: item.alt
+        }))
+      })
+
+      setOutfitItems([])
+      setOutfitName("")
+      setIsOutfitDrawerOpen(false)
+      toast.success("Outfit criado com sucesso!")
+    } catch (error) {
+      toast.error("Erro ao criar outfit")
+    }
   }
 
   const handleRemoveFromWardrobe = (itemId: string) => {
