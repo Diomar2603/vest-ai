@@ -7,12 +7,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import quote
-import requests
 import time
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
-from io import BytesIO
+from threading import Thread
+
 
 load_dotenv()
 api_key = os.getenv('gemini_key')
@@ -67,7 +67,7 @@ class SearcherClothes() :
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--window-size=1920,1080")
         self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-    
+        self.images = []
     """Transforma a lista em texto com os elementos separados por virgula"""
     def list_to_text(self, a:list) -> str:
 
@@ -90,7 +90,7 @@ class SearcherClothes() :
         print(f"[DEBUG] Consulta gerada para o Pinterest: {search_query}")
 
         
-        response_images = self.get_pinterest_images(search_query,max_images=5)
+        response_images = self.get_pinterest_images(search_query)
 
         code = response_images['statusCode']
         
@@ -152,7 +152,7 @@ class SearcherClothes() :
             return {"error":'To try connect with Gemini',"statusCode":503}
 
 
-    def get_pinterest_images(self, query, max_images=5):
+    def get_pinterest_images(self, query, max_images=10):
         
         driver = webdriver.Chrome(options=self.chrome_options)
         
@@ -167,7 +167,7 @@ class SearcherClothes() :
             )
             
             # Rola a página para carregar mais imagens
-            for _ in range(3):
+            for _ in range(2):
                 driver.execute_script("window.scrollBy(0, 1000)")
                 time.sleep(1.5)  # Aumentei o tempo de espera
                 
@@ -180,22 +180,33 @@ class SearcherClothes() :
           
             
             # Coleta as imagens
-            images = []
-            for img in driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]"):
-                src = img.get_attribute("src")
-                if src and "i.pinimg.com" in src:
-                    
-                    clean_src = src.split('?')[0]
-                    if clean_src not in images:
-                        
-                        match_img = self.analyze_img(query=query,link=clean_src)
-                        if match_img:  
-                            images.append(clean_src)
-                        if len(images) >= max_images:
-                            break
             
-            if images:
-                return {"body":images,"statusCode":200}
+
+            #################Distribuição dos elementos
+            elements = driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]")
+
+            part_size = len(elements) // 4
+            remainder = len(elements) % 4
+            parts = []
+            start = 0
+            
+            for i in range(4):
+                end = start + part_size + (1 if i < remainder else 0)  
+                parts.append(elements[start:end])
+                start = end
+
+            #####################################
+            driver_threads = []
+            for i in range(4):
+                t = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[i]))
+                driver_threads.append(t)
+                t.start()   
+
+            for t in driver_threads:
+                t.join()
+
+            if self.images:
+                return {"body":self.images,"statusCode":200}
             else:
                 return  {"error": "Images not found","statusCode":404}
         
@@ -205,6 +216,24 @@ class SearcherClothes() :
         
         finally:
             driver.quit()
+
+    def analyze_image_parallel(self,max_images:int,query:str,internet_imgs):
+
+        for img in internet_imgs:
+            src = img.get_attribute("src")
+            if src and "i.pinimg.com" in src:
+                
+                clean_src = src.split('?')[0]
+                if clean_src not in self.images:
+                    
+                    match_img = self.analyze_img(query=query,link=clean_src)
+                    print(f"Link analizado {clean_src} status {match_img} query {query}")
+                    if match_img:  
+                        self.images.append(clean_src)
+                        
+                    if len(self.images) >= max_images:
+                        break
+    
 
     "Analisa se a imagem está de acordo com a pesquisa"
     def analyze_img(self,query,link):        
@@ -233,4 +262,46 @@ class SearcherClothes() :
         if result == "sim" or result == "true":
             return True
         return False
-    
+
+# Exemplo de uso
+if __name__ == "__main__":
+     
+ 
+     params = {
+         "fullName": "Leandro D G Silva",
+         "email": "leandrodiomar123@gmail.com",
+         "password": "12345678",
+         "confirmPassword": "12345678",
+         "phoneNumber": "",
+         "dressingStyle": [
+             "Esportivo",
+             "Vintage"
+         ],
+         "preferredColors": [
+             "Preto",
+             "Branco",
+             "Marrom"
+         ],
+         "gender":"Masculino",
+         "clothingSize": "GG",
+         "fitPreference": "Oversized",
+         "age": "19",
+         "ethnicity": "Preta",
+         "hasObesity": False,
+         "hobbies": [
+             "Leitura",
+             "Exercícios físicos",
+             "Desenho",
+             "Caminhadas",
+             "Videogames"
+         ],
+         "salaryRange": "4"
+         }
+     searcher = SearcherClothes(params=params)
+     r = searcher.identify_clothes()
+ 
+     print("\nResultados encontrados:")
+     print(r)
+ 
+     # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
+     # searcher.dowloads_imgs(link=url)   
