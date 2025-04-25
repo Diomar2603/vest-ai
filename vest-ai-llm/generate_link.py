@@ -167,15 +167,15 @@ class SearcherClothes() :
             )
             
             # Rola a página para carregar mais imagens
-            # for _ in range(3):
-            #     driver.execute_script("window.scrollBy(0, 1000)")
-            #     time.sleep(1.5)  # Aumentei o tempo de espera
+            for _ in range(2):
+                driver.execute_script("window.scrollBy(0, 1000)")
+                time.sleep(1.5)  # Aumentei o tempo de espera
                 
-            #     # Verifica se já tem imagens suficientes
+                # Verifica se já tem imagens suficientes
 
-            #     current_images = driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]")
-            #     if len(current_images) >= max_images:
-            #         break
+                current_images = driver.find_elements(By.XPATH, "//img[contains(@src, 'pinimg.com')]")
+                if len(current_images) >= max_images:
+                    break
             
           
             
@@ -189,26 +189,21 @@ class SearcherClothes() :
             remainder = len(elements) % 4
             parts = []
             start = 0
+            
             for i in range(4):
                 end = start + part_size + (1 if i < remainder else 0)  
                 parts.append(elements[start:end])
                 start = end
 
             #####################################
-            t1 = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[0]))
-            t2 = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[1]))
-            t3 = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[2]))
-            t4 = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[3]))
+            driver_threads = []
+            for i in range(4):
+                t = Thread(target=self.analyze_image_parallel, args=(max_images, query, parts[i]))
+                driver_threads.append(t)
+                t.start()   
 
-            t1.start()
-            t2.start()
-            t3.start()
-            t4.start()
-
-            t1.join()
-            t2.join()
-            t3.join()
-            t4.join()
+            for t in driver_threads:
+                t.join()
 
             if self.images:
                 return {"body":self.images,"statusCode":200}
@@ -267,4 +262,46 @@ class SearcherClothes() :
         if result == "sim" or result == "true":
             return True
         return False
-    
+
+# Exemplo de uso
+if __name__ == "__main__":
+     
+ 
+     params = {
+         "fullName": "Leandro D G Silva",
+         "email": "leandrodiomar123@gmail.com",
+         "password": "12345678",
+         "confirmPassword": "12345678",
+         "phoneNumber": "",
+         "dressingStyle": [
+             "Esportivo",
+             "Vintage"
+         ],
+         "preferredColors": [
+             "Preto",
+             "Branco",
+             "Marrom"
+         ],
+         "gender":"Masculino",
+         "clothingSize": "GG",
+         "fitPreference": "Oversized",
+         "age": "19",
+         "ethnicity": "Preta",
+         "hasObesity": False,
+         "hobbies": [
+             "Leitura",
+             "Exercícios físicos",
+             "Desenho",
+             "Caminhadas",
+             "Videogames"
+         ],
+         "salaryRange": "4"
+         }
+     searcher = SearcherClothes(params=params)
+     r = searcher.identify_clothes()
+ 
+     print("\nResultados encontrados:")
+     print(r)
+ 
+     # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
+     # searcher.dowloads_imgs(link=url)   
