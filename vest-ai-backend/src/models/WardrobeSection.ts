@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 export interface IWardrobeSection extends Document {
+  _id: ObjectId;
   userId: string;
   name: string;
 }

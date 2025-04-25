@@ -1,5 +1,5 @@
 "use client"
-
+import { useEffect } from "react"
 import { useState } from "react"
 import { Menu, X, Settings, Plus, Trash, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,7 @@ import {
 import { useWardrobeSections } from "@/hooks/useWardrobeSections"
 import { useWardrobeItems, WardrobeItem } from "@/hooks/useWardrobeItems"
 import { useUpdateWardrobeSections } from "@/hooks/useUpdateWardrobeSections"
+import { useOutfits } from "@/hooks/useOutfits"
 
 export default function WardrobePage() {
   const [isOutfitDrawerOpen, setIsOutfitDrawerOpen] = useState(false)
@@ -34,9 +35,15 @@ export default function WardrobePage() {
   const [isSectionsDrawerOpen, setIsSectionsDrawerOpen] = useState(false)
   
   const { sections, isLoading: sectionsLoading } = useWardrobeSections()
-  const { items, isLoading: itemsLoading } = useWardrobeItems()
+  const { items, isLoading, deleteItem } = useWardrobeItems()
 
-  const [tempSections, setTempSections] = useState(sections || [])
+  const [tempSections, setTempSections] = useState<Array<{ _id: string; name: string }>>([])
+
+  useEffect(() => {
+    if (isSectionsDrawerOpen && sections) {
+      setTempSections(sections)
+    }
+  }, [isSectionsDrawerOpen, sections])
 
   const handleAddToOutfit = (item: WardrobeItem) => {
     const isDuplicate = outfitItems.some(existingItem => existingItem._id === item._id)
@@ -59,20 +66,43 @@ export default function WardrobePage() {
     setOutfitName("")
   }
 
-  const handleCreateOutfit = () => {
+  const { createOutfit } = useOutfits()
+
+  const handleCreateOutfit = async () => {
     if (!outfitName.trim()) {
       toast.error("Por favor, dê um nome ao seu outfit")
       return
     }
-    
-    setOutfitItems([])
-    setOutfitName("")
-    setIsOutfitDrawerOpen(false)
-    toast.success("Outfit criado com sucesso!")
+
+    try {
+      console.log(outfitItems);
+
+      await createOutfit.mutateAsync({
+        name: outfitName,
+        items: outfitItems.map(item => ({
+          id: item._id,
+          section: "", // Since these are suggestions, they don't have a section yet
+          src: item.src,
+          alt: item.alt
+        }))
+      })
+
+      setOutfitItems([])
+      setOutfitName("")
+      setIsOutfitDrawerOpen(false)
+      toast.success("Outfit criado com sucesso!")
+    } catch (error) {
+      toast.error("Erro ao criar outfit")
+    }
   }
 
-  const handleRemoveFromWardrobe = (itemId: string) => {
-    console.log('Remove item:', itemId)
+  const handleRemoveFromWardrobe = async (itemId: string) => {
+    try {
+      await deleteItem.mutateAsync(itemId)
+      toast.success("Item removido com sucesso")
+    } catch (error) {
+      toast.error("Erro ao remover item")
+    }
   }
 
   const handleUpdateSection = (id: string, newTitle: string) => {
@@ -81,7 +111,7 @@ export default function WardrobePage() {
       return
     }
     setTempSections(prev => prev.map(section => 
-      section._id === id ? { ...section, title: newTitle } : section
+      section._id === id ? { ...section, name: newTitle } : section
     ))
   }
 
@@ -113,7 +143,7 @@ export default function WardrobePage() {
     }
   }
 
-  if (sectionsLoading || itemsLoading) {
+  if (sectionsLoading || isLoading) {
     return <div>Loading...</div>
   }
 

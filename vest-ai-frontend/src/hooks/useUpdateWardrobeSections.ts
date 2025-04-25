@@ -17,7 +17,10 @@ export function useUpdateWardrobeSections() {
         body: JSON.stringify({ sections })
       })
 
-      if (!response.ok) throw new Error('Failed to update sections')
+      if (!response.ok) {
+        const errorData = await response.json()
+        toast(errorData.message);
+      }
       return response.json()
     },
     onSuccess: () => {

@@ -24,6 +24,7 @@ import { useSendMessage } from "@/hooks/useChat"
 import { Loader2 } from "lucide-react" // Add this import
 import { useWardrobeSections } from "@/hooks/useWardrobeSections";
 import { useAddToWardrobe } from "@/hooks/useAddToWardrobe"
+import { useOutfits } from "@/hooks/useOutfits"
 
 export default function ChatPage() {
   const [message, setMessage] = useState("")
@@ -96,16 +97,32 @@ export default function ChatPage() {
 
   const [outfitName, setOutfitName] = useState("")
 
-  const handleCreateOutfit = () => {
+  const { createOutfit } = useOutfits()
+
+  const handleCreateOutfit = async () => {
     if (!outfitName.trim()) {
       toast.error("Por favor, dê um nome ao seu outfit")
       return
     }
-    
-    setOutfitItems([])
-    setOutfitName("")
-    setIsOutfitDrawerOpen(false)
-    toast.success("Outfit criado com sucesso!")
+
+    try {
+      await createOutfit.mutateAsync({
+        name: outfitName,
+        items: outfitItems.map(item => ({
+          id: item.id,
+          section: "", // Since these are suggestions, they don't have a section yet
+          src: item.src,
+          alt: item.alt
+        }))
+      })
+
+      setOutfitItems([])
+      setOutfitName("")
+      setIsOutfitDrawerOpen(false)
+      toast.success("Outfit criado com sucesso!")
+    } catch (error) {
+      toast.error("Erro ao criar outfit")
+    }
   }
 
   const handleAskForOutfit = () => {

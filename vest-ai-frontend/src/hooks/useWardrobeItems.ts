@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 export interface WardrobeItem {
   _id: string
@@ -23,6 +23,24 @@ export function useWardrobeItems() {
     }
   })
 
-  return { items, isLoading }
+  const queryClient = useQueryClient()
+
+  const deleteItem = useMutation({
+    mutationFn: async (itemId: string) => {
+      const response = await fetch(`${API_URL}/wardrobe/${itemId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (!response.ok) throw new Error('Failed to delete wardrobe item')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wardrobeItems'] })
+    }
+  })
+
+  return { items, isLoading, deleteItem }
 }
 
