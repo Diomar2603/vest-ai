@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/tooltip"
 import "./styles.css"
 import { useState } from "react"
+import { useWishlist } from "@/hooks/useWishlist"
+import { toast } from "sonner"
 import { WardrobeSectionSheet } from "@/components/ui/wardrobe-section-sheet"
 
 interface ClothingCardProps {
@@ -39,6 +41,7 @@ export function ClothingCard({
   onSearchImage
 }: ClothingCardProps) {
   const [isWardrobeSheetOpen, setIsWardrobeSheetOpen] = useState(false)
+  const { addToWishlist } = useWishlist()
 
   const buttonConfig = {
     wardrobe: {
@@ -52,9 +55,14 @@ export function ClothingCard({
     wishlist: {
       icon: <ShoppingBag className="h-6 w-6" />,
       tooltip: "Adicionar à lista de desejos",
-      onClick: (e: React.MouseEvent) => {
+      onClick: async (e: React.MouseEvent) => {
         e.stopPropagation()
-        // Add wishlist action here
+        try {
+          await addToWishlist.mutateAsync({ src, alt })
+          toast.success("Item adicionado à lista de desejos")
+        } catch (error) {
+          toast.error("Erro ao adicionar à lista de desejos")
+        }
       }
     },
     outfit: {

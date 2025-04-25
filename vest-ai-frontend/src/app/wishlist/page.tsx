@@ -1,30 +1,52 @@
 "use client"
 
+import { useState } from "react"
+import { Menu, X } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { ClothingCard } from "@/components/ui/clothing-card"
 import { Header } from "@/components/ui/header"
 import { Sidebar } from "@/components/ui/sidebar"
-import { Menu, X } from "lucide-react"
-import { useState } from "react"
+import { useWishlist } from "@/hooks/useWishlist"
+import { useAddToWardrobe } from "@/hooks/useAddToWardrobe"
+import { useWardrobeSections } from "@/hooks/useWardrobeSections"
 
 export default function WishlistPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const [wishlistItems] = useState([
-    { id: 1, src: "https://media.istockphoto.com/id/483960103/pt/foto/t-shirt-preta-em-branco-à-frente-com-traçado-de-recorte.jpg?s=2048x2048&w=is&k=20&c=a_H5M2ukApXL_j5aoY3ABMAIMvbUoejjqBdUPYWOf7Y=", alt: "Item 1" },
-    { id: 2, src: "https://cdn.pixabay.com/photo/2024/05/05/04/59/ai-generated-8740190_1280.png", alt: "Item 2" },
-    { id: 3, src: "/placeholder.svg?height=300&width=300", alt: "Item 3" },
-    { id: 4, src: "/placeholder.svg?height=300&width=300", alt: "Item 4" },
-  ])
+  const { wishlistItems, isLoading, deleteFromWishlist } = useWishlist()
+  const { sections: wardrobeSections, isLoading: sectionsLoading } = useWardrobeSections()
+  const { addToWardrobe } = useAddToWardrobe()
 
-  const handleRemoveFromWishlist = (itemId: number) => {
+  const handleRemoveFromWishlist = async (itemId: string) => {
+    try {
+      await deleteFromWishlist.mutateAsync(itemId)
+      toast.success("Item removido da lista de desejos")
+    } catch (error) {
+      toast.error("Erro ao remover item da lista de desejos")
+    }
+  }
 
-    console.log('Remove item:', itemId)
+  const handleAddToWardrobe = async (itemId: string, sectionId: string) => {
+    try {
+      await addToWardrobe({ 
+        itemId, 
+        sectionId,
+        items: [{ id: itemId, src: wishlistItems?.find((item: { _id: string, src: string }) => item._id === itemId)?.src || '', alt: '' }]
+      })
+      toast.success("Item adicionado ao guarda-roupa")
+    } catch (error) {
+      toast.error("Erro ao adicionar item ao guarda-roupa")
+    }
   }
 
   const handleImageSearch = async (src: string) => {
     const urlImagem = encodeURIComponent(src);
     const urlBusca = `https://lens.google.com/uploadbyurl?url=${urlImagem}`;
     window.open(urlBusca, '_blank');
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -55,15 +77,17 @@ export default function WishlistPage() {
             <h1 className="text-3xl font-bold mb-8">Lista de Desejos</h1>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {wishlistItems.map((item) => (
+              {wishlistItems?.map((item : {_id : string, src: string, alt: string}) => (
                 <ClothingCard 
-                  key={item.id}
-                  id={item.id}
+                  key={item._id}
+                  id={item._id}
                   src={item.src}
                   alt={item.alt}
-                  buttons={["remove", "link"]}
-                  onRemoveFromWardrobe={() => handleRemoveFromWishlist(item.id)}
+                  buttons={["remove", "link", "wardrobe"]}
+                  onRemoveFromWardrobe={() => handleRemoveFromWishlist(item._id)}
                   onSearchImage={() => handleImageSearch(item.src)}
+                  onAddToWardrobe={handleAddToWardrobe}
+                  wardrobeSections={wardrobeSections}
                   isWishlist={true}
                 />
               ))}

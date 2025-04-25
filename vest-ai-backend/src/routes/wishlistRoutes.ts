@@ -7,7 +7,7 @@ const router = express.Router();
 // Get all wishlist items for the authenticated user
 router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const items = await WishlistItem.find({ userId: req.user?._id });
+    const items = await WishlistItem.find({ userId: req.user?.id });
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: "Error fetching wishlist items" });
@@ -19,7 +19,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { src, alt } = req.body;
     const item = new WishlistItem({
-      userId: req.user?._id,
+      userId: req.user?.id,
       src,
       alt
     });
@@ -35,7 +35,7 @@ router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) =>
   try {
     const item = await WishlistItem.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user?._id
+      userId: req.user?.id
     });
 
     if (!item) {
