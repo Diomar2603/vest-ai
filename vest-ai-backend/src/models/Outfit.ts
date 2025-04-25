@@ -4,7 +4,7 @@ export interface IOutfit extends Document {
   userId: string;
   name: string;
   items: Array<{
-    id: number;
+    id: string;
     src: string;
     alt: string;
   }>;
@@ -15,7 +15,7 @@ const OutfitSchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
   items: [{
-    id: Number,
+    id: String,
     src: String,
     alt: String
   }],

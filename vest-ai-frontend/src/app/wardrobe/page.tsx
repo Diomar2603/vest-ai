@@ -75,11 +75,13 @@ export default function WardrobePage() {
     }
 
     try {
+      console.log(outfitItems);
+
       await createOutfit.mutateAsync({
         name: outfitName,
         items: outfitItems.map(item => ({
           id: item._id,
-          section: item.section,
+          section: "", // Since these are suggestions, they don't have a section yet
           src: item.src,
           alt: item.alt
         }))
