@@ -119,7 +119,7 @@ router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) =>
   try {
     const item = await WardrobeItem.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user?._id
+      userId: req.user?.id
     });
     
     if (!item) {

@@ -35,7 +35,7 @@ export default function WardrobePage() {
   const [isSectionsDrawerOpen, setIsSectionsDrawerOpen] = useState(false)
   
   const { sections, isLoading: sectionsLoading } = useWardrobeSections()
-  const { items, isLoading: itemsLoading } = useWardrobeItems()
+  const { items, isLoading, deleteItem } = useWardrobeItems()
 
   const [tempSections, setTempSections] = useState<Array<{ _id: string; name: string }>>([])
 
@@ -96,8 +96,13 @@ export default function WardrobePage() {
     }
   }
 
-  const handleRemoveFromWardrobe = (itemId: string) => {
-    console.log('Remove item:', itemId)
+  const handleRemoveFromWardrobe = async (itemId: string) => {
+    try {
+      await deleteItem.mutateAsync(itemId)
+      toast.success("Item removido com sucesso")
+    } catch (error) {
+      toast.error("Erro ao remover item")
+    }
   }
 
   const handleUpdateSection = (id: string, newTitle: string) => {
@@ -138,7 +143,7 @@ export default function WardrobePage() {
     }
   }
 
-  if (sectionsLoading || itemsLoading) {
+  if (sectionsLoading || isLoading) {
     return <div>Loading...</div>
   }
 
