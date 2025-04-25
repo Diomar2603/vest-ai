@@ -33,7 +33,7 @@ export default function WishlistPage() {
         sectionId,
         items: [{ id: itemId, src: wishlistItems?.find((item: { _id: string, src: string }) => item._id === itemId)?.src || '', alt: '' }]
       })
-      toast.success("Item adicionado ao guarda-roupa")
+      //toast.success("Item adicionado ao guarda-roupa")
     } catch (error) {
       toast.error("Erro ao adicionar item ao guarda-roupa")
     }
