@@ -16,15 +16,10 @@ from threading import Thread
 
 load_dotenv()
 api_key = os.getenv('gemini_key')
+open_ai_key = os.getenv('openai_key')
 
-
-
-#######Tirar idade - colocar classificação ?
-# Tirar tamanho 
-# Double check das imagens
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", api_key=api_key)
-open_ai_key = os.getenv('openai_key')
 client_openai = OpenAI(api_key=open_ai_key)
 
 class SearcherClothes() :
@@ -189,7 +184,7 @@ class SearcherClothes() :
             remainder = len(elements) % 4
             parts = []
             start = 0
-            
+
             for i in range(4):
                 end = start + part_size + (1 if i < remainder else 0)  
                 parts.append(elements[start:end])
@@ -227,7 +222,6 @@ class SearcherClothes() :
                 if clean_src not in self.images:
                     
                     match_img = self.analyze_img(query=query,link=clean_src)
-                    print(f"Link analizado {clean_src} status {match_img} query {query}")
                     if match_img:  
                         self.images.append(clean_src)
                         
@@ -244,7 +238,7 @@ class SearcherClothes() :
             messages=[{
             "role": "user",
             "content": [
-                {"type": "text", "text": f"A imagem corresponde o que foi buscado que está abaixo ? responda Apenas com Sim ou Não \n {query}"},
+                {"type": "text", "text": f"As roupas da imagem corresponde ao que foi buscado na query abaixo ? responda Apenas com Sim ou Não \n {query}"},
                 {
                     "type": "image_url",
                     "image_url": {
@@ -261,47 +255,4 @@ class SearcherClothes() :
         
         if result == "sim" or result == "true":
             return True
-        return False
-
-# Exemplo de uso
-if __name__ == "__main__":
-     
- 
-     params = {
-         "fullName": "Leandro D G Silva",
-         "email": "leandrodiomar123@gmail.com",
-         "password": "12345678",
-         "confirmPassword": "12345678",
-         "phoneNumber": "",
-         "dressingStyle": [
-             "Esportivo",
-             "Vintage"
-         ],
-         "preferredColors": [
-             "Preto",
-             "Branco",
-             "Marrom"
-         ],
-         "gender":"Masculino",
-         "clothingSize": "GG",
-         "fitPreference": "Oversized",
-         "age": "19",
-         "ethnicity": "Preta",
-         "hasObesity": False,
-         "hobbies": [
-             "Leitura",
-             "Exercícios físicos",
-             "Desenho",
-             "Caminhadas",
-             "Videogames"
-         ],
-         "salaryRange": "4"
-         }
-     searcher = SearcherClothes(params=params)
-     r = searcher.identify_clothes()
- 
-     print("\nResultados encontrados:")
-     print(r)
- 
-     # url = 'https://i.pinimg.com/236x/41/db/5e/41db5e605e0523d16b5fac10532d84d8.jpg'
-     # searcher.dowloads_imgs(link=url)   
+        return False 
