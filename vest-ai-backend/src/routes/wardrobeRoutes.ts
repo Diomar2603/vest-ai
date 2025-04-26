@@ -99,13 +99,14 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { section, src, alt } = req.body;
 
-    console.log({ section, src, alt });
+    const x = req.user?.id;
+    console.log({ section, src, alt, x });
 
     const item = new WardrobeItem({
       userId: req.user?.id,
       section,
       src,
-      alt
+      alt : alt == '' ? 'image' : alt,
     });
     await item.save();
     res.status(201).json(item);
