@@ -85,16 +85,16 @@ export default function AccountPage() {
     },    
     {
       onSuccess: () => {
-        toast.success("Credenciais atualizadas com sucesso!");
+        toast("Perfil atualizado", {
+          description: "Seu perfil foi atualizado com sucesso",
+        })
         router.push('/account');
       },
       onError: (error: Error) => {
         toast.error(error.message || "Erro ao atualizar credenciais");
       },
     });
-    toast("Perfil atualizado", {
-      description: "Seu perfil foi atualizado com sucesso",
-    })
+    
   }
 
   const changePassword = () => {
@@ -125,7 +125,9 @@ export default function AccountPage() {
     },    
     {
       onSuccess: () => {
-        toast.success("Credenciais atualizadas com sucesso!");
+        toast("Senha atualizada",{
+          description: "Sua senha foi alterada com sucesso",
+        })
         router.push('/account');
       },
       onError: (error: Error) => {
@@ -137,10 +139,6 @@ export default function AccountPage() {
       current: "",
       new: "",
       confirm: "",
-    })
-
-    toast("Senha atualizada",{
-      description: "Sua senha foi alterada com sucesso",
     })
   }
 
