@@ -3,7 +3,6 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 export interface IUserInformations extends Document {
   _id: Types.ObjectId;
   UserId: Types.ObjectId;
-  phoneNumber?: string;
   gender: string
 
   dressingStyle: string[];
@@ -22,7 +21,6 @@ export interface IUserInformations extends Document {
 const UserInformationsSchema: Schema = new Schema(
   {
     UserId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-    phoneNumber: { type: String },
     gender: { type: String, required: true },
 
     dressingStyle: [{ type: String, required: true }],

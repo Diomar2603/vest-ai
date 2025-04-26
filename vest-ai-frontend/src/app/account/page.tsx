@@ -22,7 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { useGetUserCredentials, useUpdateCredentials , useUpdatePassword} from "@/hooks/useUser"
+import { useGetUserCredentials, useUpdateCredentials , useUpdateFashionInformations, useUpdatePassword, useUpdatePersonalInformations} from "@/hooks/useUser"
+import { useForm } from "react-hook-form";
+
 
 export default function AccountPage() {
   const router = useRouter()
@@ -30,7 +32,9 @@ export default function AccountPage() {
 
   const { data, isLoading, error } = useGetUserCredentials();
   const updateCredentialsMutation = useUpdateCredentials();
-  const updatePassword = useUpdatePassword();
+  const updatePasswordMutation = useUpdatePassword();
+  const updatePersonalInformationsMutation = useUpdatePersonalInformations();
+  const updateFashionInformationsMutation = useUpdateFashionInformations();
 
   const [userData, setUserData] = useState({
     name: "",
@@ -38,6 +42,19 @@ export default function AccountPage() {
     phone: "",
     avatar: "/placeholder.svg?height=100&width=100",
     joinDate: "",
+  });
+
+  const [userInformation, setUserInformationData] = useState({
+    age: "",
+    ethnicity: "",
+    gender: "",
+    hasObesity: false,
+    clothingSize: "",
+    fitPreference: "",
+    hobbies: [] as string[],
+    dressingStyle: [] as string[],
+    preferredColors: [] as string[],
+    salaryRange: 0
   });
   
   useEffect(() => {
@@ -49,12 +66,100 @@ export default function AccountPage() {
         avatar: "/placeholder.svg?height=100&width=100", 
         joinDate: data.joinDate,
       });
+
+      setUserInformationData({
+        gender: data.preference.gender,
+        age: data.preference.age || "Não informado",
+        ethnicity: data.preference.ethnicity || "Não informado",
+        hasObesity: data.preference.hasObesity || false,
+        clothingSize: data.preference.clothingSize,
+        fitPreference: data.preference.fitPreference,
+        hobbies: data.preference.hobbies || [],
+        dressingStyle: data.preference.dressingStyle || [],
+        preferredColors: data.preference.preferredColors || [],
+        salaryRange: data.preference.salaryRange || 0
+      })
     }
   
     if (error) {
       toast.error(error.message || "Erro ao buscar dados");
     }
   }, [data, error]);
+  
+  // Controle grids multseleções
+  const [selectedStyles, setSelectedStyles] = useState<string[]>(userInformation?.dressingStyle || []);
+  const [selectedColors, setSelectedColors] = useState<string[]>(userInformation?.preferredColors ||[]);
+  const [selectedHobies, setSelectedHobies] = useState<string[]>(userInformation?.hobbies ||[]);
+
+  const { register, setValue, watch } = useForm({
+    defaultValues: {
+      dressingStyle: [] as string [],
+      preferredColors: [] as string [],
+      hobbies: [] as string [],
+
+    },
+  });
+
+  // -> Estilos
+  useEffect(() => {
+    if (userInformation?.dressingStyle) {
+      setSelectedStyles(userInformation.dressingStyle);
+      setValue("dressingStyle", userInformation?.dressingStyle || []);
+    }
+  }, [userInformation?.dressingStyle, setValue]);
+
+  const handleStyleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (selectedStyles.includes(value)) {
+      setSelectedStyles(selectedStyles.filter((style) => style !== value));
+    } else if (selectedStyles.length < 2) {
+      setSelectedStyles([...selectedStyles, value]);
+    }
+  };
+
+  // -> Cores preferidas
+  useEffect(() => {
+    if (userInformation?.preferredColors) {
+      setSelectedColors(userInformation.preferredColors);
+      setValue("preferredColors", userInformation.preferredColors); // se RHF
+    }
+  }, [userInformation?.preferredColors, setValue]);
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let updated = [...selectedColors];
+  
+    if (selectedColors.includes(value)) {
+      updated = updated.filter((color) => color !== value);
+    } else if (selectedColors.length < 3) {
+      updated.push(value);
+    }
+  
+    setSelectedColors(updated);
+    setValue("preferredColors", updated); 
+  };
+
+  //hobbies
+  useEffect(() => {
+    if (userInformation?.hobbies) {
+      setSelectedHobies(userInformation.hobbies);
+      setValue("hobbies", userInformation.hobbies); // se RHF
+    }
+  }, [userInformation?.hobbies, setValue]);
+
+  const handleHobiesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    let updated = [...selectedHobies];
+  
+    if (selectedHobies.includes(value)) {
+      updated = updated.filter((hobie) => hobie !== value);
+    } else if (selectedHobies.length < 5) {
+      updated.push(value);
+    }
+  
+    setSelectedHobies(updated);
+    setValue("hobbies", updated); // se estiver usando React Hook Form
+  };
   
 
   // Estado das senhas
@@ -69,7 +174,6 @@ export default function AccountPage() {
 
   
   const saveProfileChanges = () => {
-
     setUserData((prev) => ({
       ...prev,
       name: (document.getElementById("name") as HTMLInputElement).value,
@@ -94,8 +198,96 @@ export default function AccountPage() {
         toast.error(error.message || "Erro ao atualizar credenciais");
       },
     });
-    
   }
+
+  const savePersonalInformations = () => {
+    setUserInformationData((prev) => ({
+      ...prev,
+      age: (document.getElementById("age") as HTMLInputElement).value,
+      ethnicity: (document.getElementById("ethnicity") as HTMLInputElement).value,
+      gender: (document.getElementById("gender") as HTMLInputElement).value,
+      hasObesity: (document.getElementById("hasObesity") as HTMLInputElement).checked,
+      salaryRange: parseInt((document.getElementById("salaryRange") as HTMLInputElement).value,10)
+    }))
+
+    updatePersonalInformationsMutation.mutate({
+      age: parseInt((document.getElementById("age") as HTMLInputElement).value, 10),
+      ethnicity: (document.getElementById("ethnicity") as HTMLInputElement).value,
+      gender: (document.getElementById("gender") as HTMLInputElement).value,
+      hasObesity: (document.getElementById("hasObesity") as HTMLInputElement).checked,
+      salaryRange: parseInt((document.getElementById("salaryRange") as HTMLInputElement).value,10)
+    },    
+    {
+      onSuccess: () => {
+        toast("Informações pessoais atualizadas", {
+          description: "Suas informações foram atualizado com sucesso",
+        })
+        router.push('/account');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || "Erro ao atualizar informações pessoais");
+      },
+    });
+  }
+
+  const saveFashionInformations = () => {
+    const errors: string[] = [];
+  
+    if (selectedStyles.length <= 0) {
+      errors.push("Selecione pelo menos um estilo.");
+    }
+  
+    if (selectedColors.length <= 0) {
+      errors.push("Selecione pelo menos uma cor preferida.");
+    }
+  
+    if (selectedHobies.length <= 0) {
+      errors.push("Selecione pelo menos um hobbie.");
+    }
+  
+    if (errors.length > 0) {
+      toast.error(
+        <div>
+          <strong>Erros encontrados:</strong>
+          <ul style={{ marginTop: 8 }}>
+            {errors.map((err, idx) => (
+              <li key={idx}>- {err}</li>
+            ))}
+          </ul>
+        </div>
+      );
+      return;
+    }
+  
+    setUserInformationData((prev) => ({
+      ...prev,
+      clothingSize: (document.getElementById("clothingSize") as HTMLInputElement).value,
+      fitPreference: (document.getElementById("fitPreference") as HTMLInputElement).value,
+      dressingStyle: selectedStyles,
+      preferredColors: selectedColors,
+      hobbies: selectedHobies
+    }));
+  
+    updateFashionInformationsMutation.mutate({
+      clothingSize: (document.getElementById("clothingSize") as HTMLInputElement).value,
+      fitPreference: (document.getElementById("fitPreference") as HTMLInputElement).value,
+      dressingStyle: selectedStyles,
+      preferredColors: selectedColors,
+      hobbies: selectedHobies
+    },    
+    {
+      onSuccess: () => {
+        toast("Preferências de estilo atualizadas", {
+          description: "Suas preferências de estilo foram atualizadas com sucesso",
+        });
+        router.push('/account');
+      },
+      onError: (error: Error) => {
+        toast.error(error.message || "Erro ao atualizar preferências de estilo");
+      },
+    });
+  };
+  
 
   const changePassword = () => {
     if (!passwords.current) {
@@ -119,7 +311,7 @@ export default function AccountPage() {
       return
     }
 
-    updatePassword.mutate({
+    updatePasswordMutation.mutate({
       oldPassword: (document.getElementById("current-password") as HTMLInputElement).value,
       newPassword: (document.getElementById("new-password") as HTMLInputElement).value,
     },    
@@ -174,9 +366,10 @@ export default function AccountPage() {
           </div>
 
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:w-auto">
+            <TabsList className="grid w-full grid-cols-3 md:w-auto">
               <TabsTrigger value="profile">Perfil</TabsTrigger>
               <TabsTrigger value="security">Segurança</TabsTrigger>
+              <TabsTrigger value="fashion">Preferências do Usuario</TabsTrigger>
             </TabsList>
 
             {/* Aba de Perfil */}
@@ -332,6 +525,269 @@ export default function AccountPage() {
                     <Button onClick={changePassword}>
                       <Lock className="h-4 w-4 mr-2" />
                       Atualizar Senha
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            {/* Aba de Preferencias de Estilo*/}
+            <TabsContent value="fashion" className="space-y-6 pt-6">
+              <div className="flex flex-col md:flex-row gap-8">
+                <Card className="flex-1">
+                  <CardHeader>
+                    <CardTitle>Preferencias de Estilo</CardTitle>
+                    <CardDescription>Nos deixe atualizados sobre você e seus gostos para ter um match perfeito com seu estilo</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+
+                      <div className="flex flex-wrap gap-8 divide-x md:divide-x md:divide-gray-300 divide-x-0">
+                        <div className="space-y-2 min-w-[300px] flex-1 border-r border-gray-300 px-4">
+                          <Label>Estilo Preferido (escolha 2 que mais se identifica)</Label>
+                          <div className="grid grid-cols-2 gap-4">
+                            {[
+                              "Casual",
+                              "Formal",
+                              "Esportivo",
+                              "Boho",
+                              "Minimalista",
+                              "Old Money",
+                              "Streetwear",
+                              "Vintage",
+                              "Gótico",
+                              "Grunge",
+                            ].map((style) => (
+                              <label key={style} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  value={style}
+                                  className="h-4 w-4"
+                                  checked={selectedStyles.includes(style)}
+                                  onChange={handleStyleChange}
+                                  disabled={
+                                    selectedStyles.length >= 2 && !selectedStyles.includes(style)
+                                  }
+                                />
+                                <span className="text-sm">{style}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-2 min-w-[300px] flex-1 border-r border-gray-300 px-4">
+                          <Label>Cores preferidas (escolha até 3)</Label>
+                          <div className="grid grid-cols-3 gap-4">
+                            {[
+                              "Preto",
+                              "Branco",
+                              "Azul",
+                              "Vermelho",
+                              "Verde",
+                              "Rosa",
+                              "Bege",
+                              "Marrom",
+                              "Roxo",
+                            ].map((color) => (
+                              <label key={color} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  value={color}
+                                  className="h-4 w-4"
+                                  checked={selectedColors.includes(color)}
+                                  onChange={handleColorChange}
+                                  disabled={
+                                    selectedColors.length >= 3 && !selectedColors.includes(color)
+                                  }
+                                />
+                                <span className="text-sm">{color}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-2 min-w-[300px] flex-1 ">
+                          <Label>Hobbies preferidos (escolha até 5)</Label>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {[
+                              "Leitura",
+                              "Viagens",
+                              "Cozinhar",
+                              "Exercícios físicos",
+                              "Pintura",
+                              "Desenho",
+                              "Música",
+                              "Fotografia",
+                              "Jardinagem",
+                              "Caminhadas",
+                              "Videogames",
+                              "Artesanato",
+                              "Colecionismo",
+                              "Meditação",
+                              "Voluntariado",
+                              "Esportes",
+                              "Estudo de línguas",
+                              "Modelismo",
+                              "Criação de conteúdo online",
+                              "Jogos de tabuleiro",
+                            ].map((hobie) => (
+                              <label key={hobie} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  value={hobie}
+                                  className="h-4 w-4"
+                                  checked={selectedHobies.includes(hobie)}
+                                  onChange={handleHobiesChange}
+                                  disabled={
+                                    selectedHobies.length >= 5 && !selectedHobies.includes(hobie)
+                                  }
+                                />
+                                <span className="text-sm">{hobie}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-4 mt-8">
+                      <h3 className="text-lg font-semibold">Tamanho e Caimento</h3>
+
+                      {/* Tamanho de Roupa */}
+                      <div className="grid gap-2">
+                        <label htmlFor="clothingSize" className="text-sm font-medium">Tamanho de roupa</label>
+                        <select
+                          id="clothingSize"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                          defaultValue={userInformation?.clothingSize || ""}
+                        >
+                          {["PP", "P", "M", "G", "GG", "XGG"].map((size) => (
+                            <option key={size} value={size}>{size}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Preferência de Caimento */}
+                      <div className="grid gap-2">
+                        <label htmlFor="fitPreference" className="text-sm font-medium">Preferência de caimento</label>
+                        <select
+                          id="fitPreference"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                          defaultValue={userInformation?.fitPreference || ""}
+                        >
+                          {["Slim Fit", "Regular Fit", "Loose Fit", "Oversized"].map((fit) => (
+                            <option key={fit} value={fit}>{fit}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-end">
+                    <Button onClick={saveFashionInformations} disabled={isUploading}>
+                      {isUploading ? (
+                        <>
+                          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          Atualizar Preferencias de Estilo
+                        </>
+                      )}
+                    </Button>
+                  </CardFooter>
+                </Card>
+
+                <Card className="w-full max-w-md mx-auto">
+                  <CardHeader>
+                    <CardTitle>Informações pessoais do usuario</CardTitle>
+                    <CardDescription>Nos atualize de suas informações pessoais</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="age" className="text-sm font-medium">Idade</Label>
+                      <Input
+                        id="age"
+                        type="number"
+                        placeholder="Idade não informada"
+                        defaultValue={userInformation.age ?? ""}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">Genero</p>
+                      <div className="grid gap-2">
+                        <select
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                          id = "gender"
+                          defaultValue={userInformation.gender}>
+                          {["Masculino", "Feminino", "Não-binário", "Outro", "Prefiro não responder"].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">Etinia</p>
+                      <div className="grid gap-2">
+                        <select
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                          id = "ethnicity"
+                          defaultValue={userInformation.ethnicity}>
+                          {["Branca", "Parda", "Preta", "Amarela", "Indígena"].map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <div className="grid gap-2">
+                        <label htmlFor="hasObesity" className="flex items-center space-x-2 text-sm font-medium">
+                          <span>Você se considera/é obeso(a)?</span>
+                          <input
+                            id="hasObesity"
+                            type="checkbox"
+                            defaultChecked={userInformation.hasObesity}
+                            className="h-4 w-4"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <Label>Faixa Salarial</Label>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                        id = "salaryRange"
+                        defaultValue={userInformation.salaryRange || "0"}
+                      >
+                        <option value="0">Selecione sua faixa salarial</option>
+                        <option value="1">Menos de R$ 1.500</option>
+                        <option value="2">R$ 1.500 - R$ 3.000</option>
+                        <option value="3">R$ 3.000 - R$ 5.000</option>
+                        <option value="4">R$ 5.000 - R$ 10.000</option>
+                        <option value="5">R$ 10.000 - R$ 20.000</option>
+                        <option value="6">R$ 20.000 - R$ 50.000</option>
+                        <option value="7">Acima de R$ 50.000</option>
+                      </select>
+                    </div>
+
+                  </CardContent>
+                  <CardFooter className="justify-end">
+                    <Button onClick={savePersonalInformations} disabled={isUploading}>
+                        {isUploading ? (
+                          <>
+                            <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Atualizar Informações pessoais
+                          </>
+                        )}
                     </Button>
                   </CardFooter>
                 </Card>

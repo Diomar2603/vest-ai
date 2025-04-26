@@ -234,7 +234,7 @@ export function RegisterForm({
                           </option>
                         ))}
                       </select>
-                    </div>
+                  </div>
                   <div className="grid gap-2">
                     <Label htmlFor="phoneNumber">Telefone (opcional)</Label>
                     <Input
@@ -461,7 +461,7 @@ export function RegisterForm({
                         </div>
                       </div>
 
-                      <div className="grid gap-2">
+                    <div className="grid gap-2">
                       <Label>Faixa Salarial</Label>
                       <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2"
