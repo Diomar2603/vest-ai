@@ -288,6 +288,21 @@ export default function AccountPage() {
     });
   };
   
+  const logout = () => {
+    // Remove do localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  
+    // Limpa o cookie
+    document.cookie = 'token=; path=/; max-age=0';
+  
+    // Mostra um toast opcional
+    toast("Você foi desconectado com sucesso.");
+  
+    // Redireciona para o login
+    router.push('/login');
+  };
+  
 
   const changePassword = () => {
     if (!passwords.current) {
@@ -458,6 +473,7 @@ export default function AccountPage() {
                       </Link>
                     </Button>
                     <Button
+                      onClick={logout}
                       variant="ghost"
                       className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
                     >

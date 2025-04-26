@@ -27,7 +27,7 @@ export function LoginForm({
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     loginMutation.mutate(data, {
       onSuccess: (response) => {
-        // Store in both localStorage and cookies
+
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         document.cookie = `token=${response.token}; path=/`;
@@ -69,12 +69,17 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Senha</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Esqueceu a senha?
-                  </a>
+                <a
+                  href="#"
+                  className="ml-auto text-sm underline-offset-2 hover:underline"
+                  onClick={(e) => {
+                    e.preventDefault(); 
+                    console.log("Esqueceu a senha clicado!");
+                    router.push('/forgot-password');
+                  }}
+                >
+                  Esqueceu a senha?
+                </a>
                 </div>
                 <Input id="password" type="password" {...register("password", {required: true})} />
                 {errors?.password && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}

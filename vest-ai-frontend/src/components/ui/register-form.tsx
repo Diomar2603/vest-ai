@@ -183,7 +183,10 @@ export function RegisterForm({
                       id="email"
                       type="email"
                       placeholder="m@example.com"
-                      {...register("email", { required: "O email é obrigatório" })}
+                      {...register("email", { required: "O email é obrigatório",
+                        validate: (value) =>
+                          /\S+@\S+\.\S+/.test(value) || "Digite um email válido",
+                       })}
                     />
                     {errors?.email && (
                       <CardDescription className="text-red-500">
