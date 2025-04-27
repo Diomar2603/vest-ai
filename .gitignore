@@ -3,7 +3,6 @@ node_modules/
 **/node_modules/
 
 # 🚀 Ignorar Builds e Compilação (para Next.js e Express)
-dist/
 .next/
 out/
 build/
