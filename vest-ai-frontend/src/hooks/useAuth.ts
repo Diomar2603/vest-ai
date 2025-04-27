@@ -26,6 +26,10 @@ interface RegisterData {
   hobbies: string[];
 }
 
+interface ResetPassword{
+  email: string;
+}
+
 
 
 export function useLogin() {
@@ -64,6 +68,28 @@ export function useRegister() {
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Failed to register');
+      }
+      
+      return response.json();
+    },
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (data: ResetPassword) => {
+      const response = await fetch(`${API_URL}/auth/resetPassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed reset password');
       }
       
       return response.json();

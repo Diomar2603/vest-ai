@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import Image from "next/image"
 import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin, useResetPassword } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 type FormValues = {
@@ -23,6 +23,7 @@ export function LoginForm({
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
   const loginMutation = useLogin();
+  const resetPasswordMutation = useResetPassword();
   
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     loginMutation.mutate(data, {
@@ -69,17 +70,35 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Senha</Label>
-                <a
-                  href="#"
-                  className="ml-auto text-sm underline-offset-2 hover:underline"
-                  onClick={(e) => {
-                    e.preventDefault(); 
-                    console.log("Esqueceu a senha clicado!");
-                    router.push('/forgot-password');
-                  }}
-                >
-                  Esqueceu a senha?
-                </a>
+                  <a
+                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      const email = (document.getElementById("email") as HTMLInputElement).value;
+
+                      if (email) {
+                        resetPasswordMutation.mutate({email: email}, {
+                          onSuccess: () => {
+                            toast.success("Sua senha foi redefinida com sucesso!", {
+                              description:
+                                "Enviamos um e-mail com a nova senha temporária. Por favor, acesse seu e-mail e use essa senha para fazer login. Recomendamos alterá-la assim que possível para garantir sua segurança",
+                            });
+                          },
+                          onError: (error: Error) => {
+                            toast.error(error.message || "Erro ao fazer login");
+                          },
+                        });
+                      } else {
+                        toast.error(
+                          "Para solicitar o caso \"Esqueci minha senha\", é necessário inserir o Email"
+                        );
+                      }
+                    }}
+                  >
+                    Esqueceu a senha?
+                  </a>
+
                 </div>
                 <Input id="password" type="password" {...register("password", {required: true})} />
                 {errors?.password && <CardDescription className="text-red-500">Campo obrigatório</CardDescription>}
