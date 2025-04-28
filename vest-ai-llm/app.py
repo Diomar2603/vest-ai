@@ -4,6 +4,9 @@ from create_look import CreateLook
 
 app = Flask(__name__)
 
+@app.route('/')
+def hello():
+    return "Comi sua mãe"
 
 @app.route('/vestAi', methods=['POST'])
 def post_api():
@@ -23,4 +26,4 @@ def post_create_look():
     return jsonify(response)
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)
