@@ -162,7 +162,7 @@ class SearcherClothes() :
             return {"error":'To try connect with Gemini',"statusCode":503}
 
 
-    def get_pinterest_images(self, query, max_images=2):
+    def get_pinterest_images(self, query, max_images=10):
         
         driver = webdriver.Chrome(options=self.chrome_options)
         
