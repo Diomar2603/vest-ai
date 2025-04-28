@@ -41,7 +41,7 @@ router.post("/message", (req, res) => __awaiter(void 0, void 0, void 0, function
             hobbies: user.hobbies,
             salaryRange: user.salaryRange
         };
-        const response = yield fetch('http://localhost:5000/vestAi', {
+        const response = yield fetch(`${process.env.LLM_ROUTE}/vestAi`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

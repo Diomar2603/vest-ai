@@ -43,7 +43,7 @@ router.post("/message", async (req, res: Response): Promise<void> => {
       salaryRange: user.salaryRange
     };
 
-    const response = await fetch('http://localhost:5000/vestAi', {
+    const response = await fetch(`${process.env.LLM_ROUTE}/vestAi`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
