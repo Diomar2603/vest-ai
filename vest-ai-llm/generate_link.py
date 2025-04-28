@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 import os
 from openai import OpenAI
 from threading import Thread
+import tempfile
 
 
 load_dotenv()
@@ -57,12 +58,26 @@ class SearcherClothes() :
             self.age_classification = 'Idoso'
 
         #Set para o selenium      
+       # self.chrome_options = Options()
+        #self.chrome_options.add_argument("--headless")
+        #self.chrome_options.add_argument("--disable-gpu")
+        #self.chrome_options.add_argument("--window-size=1920,1080")
+        #self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+        #self.images = []
+
         self.chrome_options = Options()
-        self.chrome_options.add_argument("--headless")
+        self.chrome_options.add_argument("--headless=new")  # Modo headless atualizado
         self.chrome_options.add_argument("--disable-gpu")
+        self.chrome_options.add_argument("--no-sandbox")
+        self.chrome_options.add_argument("--disable-dev-shm-usage")
         self.chrome_options.add_argument("--window-size=1920,1080")
         self.chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+        # Diretório temporário exclusivo para evitar conflito
+        temp_dir = tempfile.mkdtemp()
+        self.chrome_options.add_argument(f"--user-data-dir={temp_dir}")
         self.images = []
+
+
     """Transforma a lista em texto com os elementos separados por virgula"""
     def list_to_text(self, a:list) -> str:
 
