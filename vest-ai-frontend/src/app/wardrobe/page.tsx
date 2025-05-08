@@ -81,7 +81,7 @@ export default function WardrobePage() {
         name: outfitName,
         items: outfitItems.map(item => ({
           id: item._id,
-          section: "", // Since these are suggestions, they don't have a section yet
+          section: "", 
           src: item.src,
           alt: item.alt
         }))
@@ -176,6 +176,7 @@ export default function WardrobePage() {
               <h1 className="text-3xl font-bold mb-8">Meu Guarda-Roupa</h1>
   
               <div className="flex justify-end mb-6 gap-2">
+                {/*
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -189,7 +190,7 @@ export default function WardrobePage() {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-
+                */}
                 <Sheet open={isSectionsDrawerOpen} onOpenChange={setIsSectionsDrawerOpen}>
                   <SheetTrigger asChild>
                     <Button variant="outline" size="sm">
