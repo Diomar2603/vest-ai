@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
-import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { BaseRequest } from "../models/requests/BaseRequest";
 import UserInformation from "../models/UserInformations";
 import { Types } from 'mongoose';
 import { userInfo } from "os";
@@ -11,7 +12,7 @@ interface ChatMessage extends Request {
 
 const router = express.Router();
 
-router.post("/message", async (req, res: Response): Promise<void> => {
+router.post("/message",  authMiddleware, async (req, res: Response): Promise<void> => {
   try {
     const { message, userId } = req.body;
 

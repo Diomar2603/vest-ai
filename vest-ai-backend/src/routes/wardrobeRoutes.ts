@@ -1,13 +1,12 @@
 import express, { Request, Response } from "express";
-import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { BaseRequest } from "../models/requests/BaseRequest";
 import WardrobeItem, { IWardrobeItem } from "../models/WardrobeItem";
 import WardrobeSection from "../models/WardrobeSection";
-import IWardrobeSection from "../models/WardrobeSection";
-import { Document } from 'mongoose';
 
 const router = express.Router();
 
-router.get("/sections", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get("/sections", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const sections = await WardrobeSection.find({ userId: req.user?.id });
     res.json(sections);
@@ -17,7 +16,7 @@ router.get("/sections", authMiddleware, async (req: AuthRequest, res: Response) 
 });
 
 
-router.put("/sections", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.put("/sections", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const { sections } = req.body as { sections: Array<{ _id: string; name: string }> };
     const currentSections = await WardrobeSection.find({ userId: req.user?.id });
@@ -84,8 +83,7 @@ router.put("/sections", authMiddleware, async (req: AuthRequest, res: Response) 
   }
 });
 
-// Get all wardrobe items for the authenticated user
-router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const items = await WardrobeItem.find({ userId: req.user?.id });
     res.json(items);
@@ -94,8 +92,7 @@ router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// Add a new wardrobe item
-router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const { section, src, alt } = req.body;
 
@@ -115,8 +112,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// Delete a wardrobe item
-router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const item = await WardrobeItem.findOneAndDelete({
       _id: req.params.id,

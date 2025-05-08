@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Comi sua mãe"
+    return "Running"
 
 @app.route('/vestAi', methods=['POST'])
 def post_api():

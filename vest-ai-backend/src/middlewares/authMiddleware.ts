@@ -1,11 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { BaseRequest } from "../models/requests/BaseRequest";
 
-export interface AuthRequest extends Request {
-  user?: any;
-}
-
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const authMiddleware = (req: BaseRequest, res: Response, next: NextFunction): void => {
   const token = req.header("Authorization")?.split(" ")[1];
 
   if (!token) {

@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
-import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { BaseRequest } from "../models/requests/BaseRequest";
 import WishlistItem from "../models/WishlistItem";
 
 const router = express.Router();
 
-// Get all wishlist items for the authenticated user
-router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const items = await WishlistItem.find({ userId: req.user?.id });
     res.json(items);
@@ -14,8 +14,7 @@ router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// Add a new wishlist item
-router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const { src, alt } = req.body;
     const item = new WishlistItem({
@@ -30,8 +29,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// Delete a wishlist item
-router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const item = await WishlistItem.findOneAndDelete({
       _id: req.params.id,

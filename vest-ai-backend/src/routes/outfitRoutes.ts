@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
-import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { BaseRequest } from "../models/requests/BaseRequest";
 import Outfit from "../models/Outfit";
 
 const router = express.Router();
 
-router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.get("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const outfits = await Outfit.find({ userId: req.user?.id });
     res.json(outfits);
@@ -13,7 +14,7 @@ router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const { name, items } = req.body;
 
@@ -30,7 +31,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.delete("/:id", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const outfit = await Outfit.findOneAndDelete({
       _id: req.params.id,

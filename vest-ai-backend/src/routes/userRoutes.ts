@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
-import { authMiddleware, AuthRequest } from "../middlewares/authMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { BaseRequest } from "../models/requests/BaseRequest";
 import User from "../models/User";
 import bcrypt from 'bcryptjs';
 import UserInformations from "../models/UserInformations";
@@ -7,7 +8,7 @@ import { UserProfileDTO } from "../dto/UserDto";
 
 const router = express.Router();
 
-router.get("/credentials", authMiddleware, async (req: AuthRequest, res: Response): Promise<void> => {
+router.get("/credentials", authMiddleware, async (req: BaseRequest, res: Response): Promise<void> => {
   try {
     const user = await User.findOne({ _id: req.user.id }).lean();
     const userInformations = await UserInformations.findOne({ UserId: req.user.id }).lean();
@@ -43,7 +44,7 @@ router.get("/credentials", authMiddleware, async (req: AuthRequest, res: Respons
   }
 });
 
-router.post("/updateCredentials", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/updateCredentials", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const {
       fullName,
@@ -58,7 +59,7 @@ router.post("/updateCredentials", authMiddleware, async (req: AuthRequest, res: 
   }
 });
 
-router.post("/updatePersonalInformations", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/updatePersonalInformations", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const {
       age,
@@ -75,7 +76,7 @@ router.post("/updatePersonalInformations", authMiddleware, async (req: AuthReque
   }
 });
 
-router.post("/updateFashionInformations", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/updateFashionInformations", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const {
       dressingStyle,
@@ -94,7 +95,7 @@ router.post("/updateFashionInformations", authMiddleware, async (req: AuthReques
   }
 });
 
-router.post("/updatePassword", authMiddleware, async (req: AuthRequest, res: Response) => {
+router.post("/updatePassword", authMiddleware, async (req: BaseRequest, res: Response) => {
   try {
     const {
       oldPassword,
