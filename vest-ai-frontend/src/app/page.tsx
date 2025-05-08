@@ -72,7 +72,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card>
                 <CardHeader>
                   <div className="p-2 w-12 h-12 rounded-full bg-primary/10 mb-4 flex items-center justify-center">
@@ -101,6 +101,7 @@ export default function Home() {
                 </CardContent>
               </Card>
 
+              {/*
               <Card>
                 <CardHeader>
                   <div className="p-2 w-12 h-12 rounded-full bg-primary/10 mb-4 flex items-center justify-center">
@@ -114,6 +115,7 @@ export default function Home() {
                   </p>
                 </CardContent>
               </Card>
+              */}
             </div>
           </div>
         </section>
@@ -154,7 +156,7 @@ export default function Home() {
                   </div>
                   <div className="rounded-lg overflow-hidden border">
                     <Image
-                      src="/placeholder.svg?height=400&width=500"
+                      src="/images/form.png"
                       alt="Interface de criação de perfil"
                       width={500}
                       height={400}
@@ -173,7 +175,6 @@ export default function Home() {
                     </p>
                     <ul className="space-y-2">
                       {[
-                        "Correspondência de paleta de cores",
                         "Detecção de preferências de estilo",
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2">
@@ -185,7 +186,7 @@ export default function Home() {
                   </div>
                   <div className="rounded-lg overflow-hidden border">
                     <Image
-                      src="/placeholder.svg?height=400&width=500"
+                      src="/images/sugestoes.png"
                       alt="Visualização da análise da IA"
                       width={500}
                       height={400}
@@ -216,7 +217,7 @@ export default function Home() {
                   </div>
                   <div className="rounded-lg overflow-hidden border">
                     <Image
-                      src="/placeholder.svg?height=400&width=500"
+                      src="/images/guarda-roupa.png"
                       alt="Interface de recomendações de looks"
                       width={500}
                       height={400}

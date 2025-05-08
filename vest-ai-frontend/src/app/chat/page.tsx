@@ -21,7 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useSendMessage } from "@/hooks/useChat"
-import { Loader2 } from "lucide-react" // Add this import
+import { Loader2 } from "lucide-react" 
 import { useWardrobeSections } from "@/hooks/useWardrobeSections";
 import { useAddToWardrobe } from "@/hooks/useAddToWardrobe"
 import { useOutfits } from "@/hooks/useOutfits"
@@ -54,7 +54,6 @@ export default function ChatPage() {
         userId: userInfo.id
       })
       
-      // Add AI response
       setMessages(prev => [...prev, { 
         text: "Aqui estão algumas sugestões de looks baseadas no seu estilo!", 
         sender: "ai" 
@@ -110,7 +109,7 @@ export default function ChatPage() {
         name: outfitName,
         items: outfitItems.map(item => ({
           id: item.id,
-          section: "", // Since these are suggestions, they don't have a section yet
+          section: "", 
           src: item.src,
           alt: item.alt
         }))
