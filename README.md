@@ -45,8 +45,8 @@ O VestAI combina funcionalidades implementadas e testadas com uma visão clara p
 
 Este projeto foi desenvolvido por:
 
-* [cite_start]Carlos Gabriel Dos Anjos Quintino 
-* [cite_start]Leandro Diomar Gomes da Silva 
-* [cite_start]Victor Cobo Figueiro 
+* Carlos Gabriel Dos Anjos Quintino 
+* Leandro Diomar Gomes da Silva 
+* Victor Cobo Figueiro 
 
 ---
