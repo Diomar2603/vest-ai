@@ -36,7 +36,7 @@ O VestAI combina funcionalidades implementadas e testadas com uma visão clara p
 * [cite_start]**Frontend:** Aplicação SPA (Single Page Application) desenvolvida com **React**.
 * [cite_start]**Backend:** Servidor de API RESTful construído com **Node.js**.
 * [cite_start]**Banco de Dados:** **MongoDB** para armazenamento de dados.
-* [cite_start]**Inteligência Artificial:** Integração com um **LLM** (Large Language Model) para a geração de sugestões.
+* [cite_start]**Inteligência Artificial:** Integração com um **LLM** (Large Language Model) para a geração de sugestões com **Python**.
 * [cite_start]**Fonte de Dados:** Um **Crawler** é utilizado para alimentar o sistema.
 * [cite_start]**Comunicação:** A transferência de dados entre cliente e servidor é feita via **Requisições HTTP** com o formato **JSON**.
 
